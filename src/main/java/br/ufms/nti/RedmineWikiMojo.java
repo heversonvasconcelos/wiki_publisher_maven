@@ -1,12 +1,16 @@
 package br.ufms.nti;
 
 import java.io.File;
+import java.net.URL;
+import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
+import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.reporting.AbstractMavenReport;
 import org.apache.maven.reporting.MavenReportException;
+import org.apache.maven.wagon.authentication.AuthenticationInfo;
 import org.codehaus.doxia.site.renderer.SiteRenderer;
 
 /**
@@ -51,6 +55,50 @@ public class RedmineWikiMojo extends AbstractMavenReport {
 	 */
 	private SiteRenderer siteRenderer;
 
+	/**
+	 * The Maven Wagon manager to use when obtaining server authentication
+	 * details.
+	 * 
+	 * @component role="org.apache.maven.artifact.manager.WagonManager"
+	 * @required
+	 * @readonly
+	 */
+	private WagonManager wagonManager;
+
+	/**
+	 * The tomcat username to use for deployment
+	 * 
+	 * @parameter expression="${tomcat.username}"
+	 * @since 1.0-alpha-2
+	 */
+	private String username;
+
+	/**
+	 * The password to use for deployment
+	 * 
+	 * @parameter expression="${tomcat.password}"
+	 * @since 1.0-alpha-2
+	 */
+	private String password;
+
+	/**
+	 * The full URL of the Tomcat manager instance to use.
+	 * 
+	 * @parameter expression="${maven.tomcat.url}"
+	 *            default-value="http://localhost:8080/manager"
+	 * @required
+	 */
+	private URL url;
+
+	/**
+	 * The server id in settings.xml to use when authenticating with Tomcat
+	 * manager, or <code>null</code> to use defaults of username
+	 * <code>admin</code> and no password.
+	 * 
+	 * @parameter expression="${maven.tomcat.server}"
+	 */
+	private String server;
+
 	@Override
 	public String getOutputName() {
 		return outputName;
@@ -58,12 +106,12 @@ public class RedmineWikiMojo extends AbstractMavenReport {
 
 	@Override
 	public String getName(Locale locale) {
-		return this.getBundle(locale).getString("redmine-wiki-name");
+		return this.getMessage(locale, "redmine-wiki-name");
 	}
 
 	@Override
 	public String getDescription(Locale locale) {
-		return this.getBundle(locale).getString("redmine-wiki-description");
+		return this.getMessage(locale, "redmine-wiki-description");
 	}
 
 	@Override
@@ -84,10 +132,32 @@ public class RedmineWikiMojo extends AbstractMavenReport {
 	@Override
 	protected void executeReport(Locale locale) throws MavenReportException {
 		getLog().info("Executando hello plugin");
+		AuthenticationInfo info = wagonManager.getAuthenticationInfo(server);
+
+		if (info == null) {
+			String msg = getMessage(locale, "redmine-wiki-unknown-server",
+					server);
+			getLog().error(msg);
+			return;
+		}
+		username = info.getUserName();
+		password = info.getPassword();
 	}
 
-	private ResourceBundle getBundle(Locale locale) {
-		return ResourceBundle.getBundle("messages", locale, this.getClass()
-				.getClassLoader());
+	private String getMessage(Locale locale, String key, Object... params) {
+		String texto = ResourceBundle.getBundle("messages", locale,
+				this.getClass().getClassLoader()).getString(key);
+		if (params != null) {
+			return getParameterizedMessage(texto, locale, params);
+		}
+		return texto;
+	}
+
+	private String getParameterizedMessage(String message, Locale locale,
+			Object[] params) {
+		MessageFormat messageFormat = new MessageFormat(message, locale);
+		message = messageFormat.format(params, new StringBuffer(), null)
+				.toString();
+		return message;
 	}
 }
