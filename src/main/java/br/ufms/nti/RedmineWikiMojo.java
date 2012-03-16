@@ -1,16 +1,14 @@
 package br.ufms.nti;
 
 import java.io.File;
-import java.net.URL;
 import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
 import org.apache.maven.artifact.manager.WagonManager;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.reporting.AbstractMavenReport;
-import org.apache.maven.reporting.MavenReportException;
-import org.apache.maven.wagon.authentication.AuthenticationInfo;
 import org.codehaus.doxia.site.renderer.SiteRenderer;
 
 /**
@@ -19,7 +17,7 @@ import org.codehaus.doxia.site.renderer.SiteRenderer;
  * @goal redmine-wiki
  * 
  */
-public class RedmineWikiMojo extends AbstractMavenReport {
+public class RedmineWikiMojo extends AbstractRedmineMojo {
 
 	/**
 	 * The maven project
@@ -82,13 +80,13 @@ public class RedmineWikiMojo extends AbstractMavenReport {
 	private String password;
 
 	/**
-	 * The full URL of the Tomcat manager instance to use.
+	 * Redmine url.
 	 * 
-	 * @parameter expression="${maven.tomcat.url}"
-	 *            default-value="http://localhost:8080/manager"
+	 * @parameter default-value="${project.issueManagement.url}"
+	 *            expression="${redmineUrl}"
 	 * @required
 	 */
-	private URL url;
+	private String url;
 
 	/**
 	 * The server id in settings.xml to use when authenticating with Tomcat
@@ -96,8 +94,19 @@ public class RedmineWikiMojo extends AbstractMavenReport {
 	 * <code>admin</code> and no password.
 	 * 
 	 * @parameter expression="${maven.tomcat.server}"
+	 * @required
 	 */
-	private String server;
+	private String redmineServer;
+
+	/**
+	 * The server id in settings.xml to use when authenticating with Tomcat
+	 * manager, or <code>null</code> to use defaults of username
+	 * <code>admin</code> and no password.
+	 * 
+	 * @parameter expression="${maven.tomcat.server}"
+	 * @required
+	 */
+	private String redmineDatabaseServer;
 
 	@Override
 	public String getOutputName() {
@@ -130,34 +139,9 @@ public class RedmineWikiMojo extends AbstractMavenReport {
 	}
 
 	@Override
-	protected void executeReport(Locale locale) throws MavenReportException {
+	public void executeWhileLogged() throws MojoExecutionException,
+			MojoFailureException {
 		getLog().info("Executando hello plugin");
-		AuthenticationInfo info = wagonManager.getAuthenticationInfo(server);
-
-		if (info == null) {
-			String msg = getMessage(locale, "redmine-wiki-unknown-server",
-					server);
-			getLog().error(msg);
-			return;
-		}
-		username = info.getUserName();
-		password = info.getPassword();
 	}
-
-	private String getMessage(Locale locale, String key, Object... params) {
-		String texto = ResourceBundle.getBundle("messages", locale,
-				this.getClass().getClassLoader()).getString(key);
-		if (params != null) {
-			return getParameterizedMessage(texto, locale, params);
-		}
-		return texto;
-	}
-
-	private String getParameterizedMessage(String message, Locale locale,
-			Object[] params) {
-		MessageFormat messageFormat = new MessageFormat(message, locale);
-		message = messageFormat.format(params, new StringBuffer(), null)
-				.toString();
-		return message;
-	}
+	
 }
