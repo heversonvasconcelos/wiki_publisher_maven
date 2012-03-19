@@ -1,18 +1,18 @@
 /**
  * Copyright 2008 fastConnect.
- * 
+ *
  * This file is part of maven-redmine-plugin Mojo.
- * 
+ *
  * This is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This software is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -20,16 +20,12 @@
 package br.ufms.nti;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
-import java.util.ResourceBundle;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -41,19 +37,14 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
-import org.apache.maven.artifact.manager.WagonManager;
+import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.project.MavenProject;
-import org.apache.maven.reporting.AbstractMavenReport;
-import org.apache.maven.reporting.MavenReportException;
-import org.apache.maven.wagon.authentication.AuthenticationInfo;
-import org.codehaus.doxia.site.renderer.SiteRenderer;
 
 /**
  * Provides basic methods to interact with Redmine.
  */
-public abstract class AbstractRedmineMojo extends AbstractMavenReport {
+public abstract class AbstractRedmineMojo extends AbstractMojo {
 
 	final private DefaultHttpClient httpClient = new DefaultHttpClient();
 
@@ -91,70 +82,6 @@ public abstract class AbstractRedmineMojo extends AbstractMavenReport {
 	 */
 	private String projectIdentifier;
 
-	/**
-	 * The maven project
-	 * 
-	 * @parameter expression="${project}"
-	 * @readonly
-	 */
-	private MavenProject project;
-
-	/**
-	 * The filename to use for the report.
-	 * 
-	 * @parameter expression="hello-report"
-	 * @readonly
-	 */
-	private String outputName;
-
-	/**
-	 * Directory containing The generated DashBoard report Datafile
-	 * "dashboard-report.xml".
-	 * 
-	 * @parameter expression="${project.reporting.outputDirectory}"
-	 * @required
-	 */
-	private File outputDirectory;
-
-	/**
-	 * Site Renderer
-	 * 
-	 * @parameter 
-	 *            expression="${component.org.codehaus.doxia.site.renderer.SiteRenderer}"
-	 * @readonly
-	 */
-	private SiteRenderer siteRenderer;
-
-	/**
-	 * The Maven Wagon manager to use when obtaining server authentication
-	 * details.
-	 * 
-	 * @component role="org.apache.maven.artifact.manager.WagonManager"
-	 * @required
-	 * @readonly
-	 */
-	private WagonManager wagonManager;
-
-	/**
-	 * The server id in settings.xml to use when authenticating with Tomcat
-	 * manager, or <code>null</code> to use defaults of username
-	 * <code>admin</code> and no password.
-	 * 
-	 * @parameter expression="${maven.tomcat.server}"
-	 * @required
-	 */
-	private String redmineServer;
-
-	/**
-	 * The server id in settings.xml to use when authenticating with Tomcat
-	 * manager, or <code>null</code> to use defaults of username
-	 * <code>admin</code> and no password.
-	 * 
-	 * @parameter expression="${maven.tomcat.server}"
-	 * @required
-	 */
-	private String redmineDatabaseServer;
-
 	protected final String getProjectIdentifier() {
 		return this.projectIdentifier;
 	}
@@ -166,18 +93,15 @@ public abstract class AbstractRedmineMojo extends AbstractMavenReport {
 		return this.url;
 	}
 
+	@Override
+	public void execute() throws MojoExecutionException, MojoFailureException {
+		login();
+
+		executeWhileLogged();
+	}
+
 	public abstract void executeWhileLogged() throws MojoExecutionException,
 			MojoFailureException;
-
-	@Override
-	protected void executeReport(Locale locale) throws MavenReportException {
-		try {
-			login(locale);
-			executeWhileLogged();
-		} catch (Exception e) {
-			throw new MavenReportException("Erro", e);
-		}
-	}
 
 	private String generateURI(final String suffix) {
 		final String normalizedSuffix = suffix.startsWith("/") ? suffix
@@ -189,22 +113,8 @@ public abstract class AbstractRedmineMojo extends AbstractMavenReport {
 		}
 	}
 
-	private void login(Locale locale) throws MojoExecutionException,
-			MojoFailureException {
+	private void login() throws MojoExecutionException, MojoFailureException {
 		try {
-
-			AuthenticationInfo info = wagonManager
-					.getAuthenticationInfo(redmineServer);
-
-			if (info == null) {
-				String msg = getMessage(locale, "redmine-wiki-unknown-server",
-						redmineServer);
-				getLog().error(msg);
-				return;
-			}
-			username = info.getUserName();
-			password = info.getPassword();
-
 			final Map<String, String> parameters = new HashMap<String, String>();
 			parameters.put("username", this.username);
 			parameters.put("password", this.password);
@@ -355,20 +265,4 @@ public abstract class AbstractRedmineMojo extends AbstractMavenReport {
 		}
 	}
 
-	protected String getMessage(Locale locale, String key, Object... params) {
-		String texto = ResourceBundle.getBundle("messages", locale,
-				this.getClass().getClassLoader()).getString(key);
-		if (params != null) {
-			return getParameterizedMessage(texto, locale, params);
-		}
-		return texto;
-	}
-
-	protected String getParameterizedMessage(String message, Locale locale,
-			Object[] params) {
-		MessageFormat messageFormat = new MessageFormat(message, locale);
-		message = messageFormat.format(params, new StringBuffer(), null)
-				.toString();
-		return message;
-	}
 }
