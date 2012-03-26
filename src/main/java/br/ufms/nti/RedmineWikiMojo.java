@@ -18,6 +18,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
@@ -149,20 +150,27 @@ public class RedmineWikiMojo extends AbstractMavenReport {
 		try {
 			redmineDatabaseServer.toString();
 			login(locale);
-			// buscar tarefas
-			final String fullContent = executeRequest("projects/"
-					+ projectIdentifier + "/issues");
-			final String pattern = "<tr id=\"issue(.*)</tr>";
+			executeWhileLogged();
+		} catch (MojoFailureException e) {
+			System.out.println(e.getMessage());
+		} catch (MojoExecutionException e) {
+			System.out.println(e.getMessage());
+		}
+	}
 
-			final Matcher matcher = Pattern.compile(pattern).matcher(
-					fullContent);
-			if (matcher.find()) {
-				final String issuesPageContent = executeRequest("/versions/show/"
-						+ matcher.group(1));
-			} else {
-			}
-		} catch (Exception e) {
-			throw new MavenReportException("Erro", e);
+	public void executeWhileLogged() throws MojoFailureException,
+			MojoExecutionException {
+
+		// buscar tarefas
+		final String fullContent = executeRequest("projects/"
+				+ projectIdentifier + "/issues");
+		final String pattern = "<tr id=\"issue(.*)</tr>";
+
+		final Matcher matcher = Pattern.compile(pattern).matcher(fullContent);
+		if (matcher.find()) {
+			final String issuesPageContent = executeRequest("/versions/show/"
+					+ matcher.group(1));
+		} else {
 		}
 	}
 
@@ -278,6 +286,8 @@ public class RedmineWikiMojo extends AbstractMavenReport {
 	}
 
 	/**
+	 * Access a request using GET method, read the content, validate it.
+	 * 
 	 * @param requestURI
 	 *            the URL to access
 	 * @return the result of the request
@@ -290,7 +300,25 @@ public class RedmineWikiMojo extends AbstractMavenReport {
 	 */
 	public String executeRequest(final String requestURI)
 			throws MojoFailureException, MojoExecutionException {
-		return executeRequest(requestURI, null);
+		try {
+			final HttpGet request = new HttpGet(generateURI(requestURI));
+			final HttpResponse response = this.httpClient.execute(request);
+			if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
+				response.getEntity().consumeContent();
+				throw new MojoExecutionException("Got error code <"
+						+ response.getStatusLine().getStatusCode() + ":"
+						+ response.getStatusLine().getReasonPhrase()
+						+ "> while accessing " + request.getRequestLine() + "s");
+			} else {
+				final String pageContent = readFully(response);
+				validateResult(pageContent);
+				return pageContent;
+			}
+		} catch (MojoExecutionException e) {
+			throw e;
+		} catch (Exception e) {
+			throw new MojoFailureException(e.getMessage());
+		}
 	}
 
 	/**
@@ -323,7 +351,6 @@ public class RedmineWikiMojo extends AbstractMavenReport {
 						HTTP.UTF_8));
 			}
 			final HttpResponse response = this.httpClient.execute(request);
-			;
 			if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
 				response.getEntity().consumeContent();
 				throw new MojoExecutionException("Got error code <"

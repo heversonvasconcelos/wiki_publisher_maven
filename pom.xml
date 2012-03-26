@@ -63,29 +63,13 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
-
-	<build>
+	<reporting>
 		<plugins>
-			<!-- COMPILER -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<source>${jdk.compiler.version}</source>
-					<target>${jdk.compiler.version}</target>
-					<encoding>${project.build.sourceEncoding}</encoding>
-				</configuration>
-			</plugin>
-			<!-- ECLIPSE -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-eclipse-plugin</artifactId>
-				<configuration>
-					<downloadSources>true</downloadSources>
-					<downloadJavadocs>false</downloadJavadocs>
-				</configuration>
+				<artifactId>maven-plugin-plugin</artifactId>
 			</plugin>
 		</plugins>
-	</build>
+	</reporting>
 
 </project>
