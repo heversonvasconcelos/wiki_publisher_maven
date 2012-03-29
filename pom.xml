@@ -23,6 +23,13 @@
 			<organizationUrl>http://ufms.br</organizationUrl>
 			<timezone>-4</timezone>
 		</developer>
+		<developer>
+			<id>heverson.vasconcelos</id>
+			<email>heverson.vasconcelos@ufms.br</email>
+			<organization>UFMS</organization>
+			<organizationUrl>http://ufms.br</organizationUrl>
+			<timezone>-4</timezone>
+		</developer>
 	</developers>
 
 	<properties>
