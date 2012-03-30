@@ -40,12 +40,13 @@ public class RequestTest {
 
 	private void report() throws URISyntaxException,
 			UnsupportedEncodingException, HttpException, IOException {
-		String requestURI = "http://debianvm:8080/redmine/projects/projetoteste";
-
+		String requestURI = "http://repositorio.nti.ufms.br/redmine/projects/commons/wiki/Wiki/edit";
+		
 		Map<String, String> parameters = new HashMap<String, String>();
 		parameters.put("authenticity_token", authenticityToken);
-		// parameters.put("commit", "Save");
-		// parameters.put("content[text]", "h1. Hello World");
+		parameters.put("commit", "Save");
+		parameters.put("content[text]", "h2. Hello World");
+		
 
 		HttpPost request = new HttpPost(requestURI);
 		List<NameValuePair> valuePairs = new ArrayList<NameValuePair>();
@@ -61,7 +62,7 @@ public class RequestTest {
 
 	private void view() throws URISyntaxException,
 			UnsupportedEncodingException, HttpException, IOException {
-		String requestURI = "http://debianvm:8080/redmine/projects/projetoteste/issues";
+		String requestURI = "http://repositorio.nti.ufms.br/redmine/projects/commons/issues";
 
 		HttpGet request = new HttpGet(requestURI);
 		HttpResponse response = httpClient.execute(request);
@@ -75,13 +76,13 @@ public class RequestTest {
 
 	private void viewWiki() throws URISyntaxException,
 			UnsupportedEncodingException, HttpException, IOException {
-		String requestURI = "http://debianvm:8080/redmine/projects/projetoteste/wiki/Wiki/edit";
+		String requestURI = "http://repositorio.nti.ufms.br/redmine/projects/commons/wiki";
 
 		HttpGet request = new HttpGet(requestURI);
 		HttpResponse response = httpClient.execute(request);
 
 		String pageContent = readFully(response);
-		String pattern = "h2. Hello";
+		String pattern = "Novo arquivo";
 		Matcher matcher = Pattern.compile(pattern).matcher(pageContent);
 		System.out.println(pageContent);
 		Assert.assertTrue(matcher.find());
@@ -89,10 +90,10 @@ public class RequestTest {
 
 	private void login() throws URISyntaxException,
 			UnsupportedEncodingException, HttpException, IOException {
-		String requestURI = "http://debianvm:8080/redmine/login";
+		String requestURI = "http://repositorio.nti.ufms.br/redmine/login";
 		Map<String, String> parameters = new HashMap<String, String>();
-		parameters.put("username", "heverson.vasconcelos");
-		parameters.put("password", "12345678");
+		parameters.put("username", "vinicius.souza");
+		parameters.put("password", "vinicius1988");
 
 		HttpPost request = new HttpPost(requestURI);
 		if (parameters != null) {
