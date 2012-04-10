@@ -115,7 +115,7 @@ public abstract class AbstractRedmineMojo extends AbstractMavenReport {
 	 * @required
 	 * @readonly
 	 */
-	private WagonManager wagonManager;
+	protected WagonManager wagonManager;
 
 	/**
 	 * The server id in settings.xml to use when authenticating with Tomcat
@@ -126,16 +126,6 @@ public abstract class AbstractRedmineMojo extends AbstractMavenReport {
 	 * @required
 	 */
 	private String redmineServer;
-
-	/**
-	 * The server id in settings.xml to use when authenticating with Tomcat
-	 * manager, or <code>null</code> to use defaults of username
-	 * <code>admin</code> and no password.
-	 * 
-	 * @parameter expression="${maven.tomcat.server}"
-	 * @required
-	 */
-	private String redmineDatabaseServer;
 
 	private String authenticityToken;
 
@@ -247,22 +237,10 @@ public abstract class AbstractRedmineMojo extends AbstractMavenReport {
 		return authenticityToken;
 	}
 
-	@Override
-	protected void executeReport(Locale locale) throws MavenReportException {
-		try {
-			login(locale);
-			executeWhileLogged();
-		} catch (MojoFailureException e) {
-			System.out.println(e.getMessage());
-		} catch (MojoExecutionException e) {
-			System.out.println(e.getMessage());
-		}
-	}
+	protected abstract void executeReport(Locale locale)
+			throws MavenReportException;
 
-	protected abstract void executeWhileLogged() throws MojoFailureException,
-			MojoExecutionException;
-
-	private String login(Locale locale) throws MojoExecutionException,
+	protected String login(Locale locale) throws MojoExecutionException,
 			MojoFailureException {
 		try {
 

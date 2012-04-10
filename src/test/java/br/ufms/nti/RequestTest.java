@@ -20,6 +20,7 @@ import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
@@ -34,19 +35,18 @@ public class RequestTest {
 
 		login();
 		report();
-		view();
-		viewWiki();
+		// view();
+//		viewWiki();
 	}
 
 	private void report() throws URISyntaxException,
 			UnsupportedEncodingException, HttpException, IOException {
-		String requestURI = "http://repositorio.nti.ufms.br/redmine/projects/commons/wiki/Wiki/edit";
-		
+		String requestURI = "http://debianvm:8080/redmine/projects/projetoteste/wiki";
+
 		Map<String, String> parameters = new HashMap<String, String>();
 		parameters.put("authenticity_token", authenticityToken);
 		parameters.put("commit", "Save");
-		parameters.put("content[text]", "h2. Hello World");
-		
+		parameters.put("content[text]", "{{repo_include(/trunk/pom.xml)}}");
 
 		HttpPost request = new HttpPost(requestURI);
 		List<NameValuePair> valuePairs = new ArrayList<NameValuePair>();
@@ -62,7 +62,7 @@ public class RequestTest {
 
 	private void view() throws URISyntaxException,
 			UnsupportedEncodingException, HttpException, IOException {
-		String requestURI = "http://repositorio.nti.ufms.br/redmine/projects/commons/issues";
+		String requestURI = "http://debianvm:8080/redmine/projects/projetoteste/issues";
 
 		HttpGet request = new HttpGet(requestURI);
 		HttpResponse response = httpClient.execute(request);
@@ -76,13 +76,13 @@ public class RequestTest {
 
 	private void viewWiki() throws URISyntaxException,
 			UnsupportedEncodingException, HttpException, IOException {
-		String requestURI = "http://repositorio.nti.ufms.br/redmine/projects/commons/wiki";
+		String requestURI = "http://debianvm:8080/redmine/projects/projetoteste/wiki";
 
 		HttpGet request = new HttpGet(requestURI);
 		HttpResponse response = httpClient.execute(request);
 
 		String pageContent = readFully(response);
-		String pattern = "Novo arquivo";
+		String pattern = "content[text]";
 		Matcher matcher = Pattern.compile(pattern).matcher(pageContent);
 		System.out.println(pageContent);
 		Assert.assertTrue(matcher.find());
@@ -92,8 +92,8 @@ public class RequestTest {
 			UnsupportedEncodingException, HttpException, IOException {
 		String requestURI = "http://repositorio.nti.ufms.br/redmine/login";
 		Map<String, String> parameters = new HashMap<String, String>();
-		parameters.put("username", "vinicius.souza");
-		parameters.put("password", "vinicius1988");
+		parameters.put("username", "heverson.vasconcelos");
+		parameters.put("password", "12345678");
 
 		HttpPost request = new HttpPost(requestURI);
 		if (parameters != null) {
@@ -106,7 +106,7 @@ public class RequestTest {
 		}
 		HttpResponse response = httpClient.execute(request);
 		String pageContent = readFully(response);
-		System.out.println(pageContent);
+		// System.out.println(pageContent);
 		authenticityToken = getAuthenticityToken(pageContent);
 	}
 
