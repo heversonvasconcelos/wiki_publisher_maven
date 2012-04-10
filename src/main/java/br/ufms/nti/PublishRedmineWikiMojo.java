@@ -1,6 +1,9 @@
 package br.ufms.nti;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.Reader;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -57,10 +60,10 @@ public class PublishRedmineWikiMojo extends AbstractMavenReport {
 	/**
 	 * Redmine database url
 	 * 
-	 * @parameter expression="${redmineDatabaseURL}"
+	 * @parameter expression="${redmineDatabaseUrl}"
 	 * @required
 	 */
-	private String redmineDatabaseServerURL;
+	private String redmineDatabaseUrl;
 
 	/**
 	 * Redmine database driver
@@ -121,8 +124,8 @@ public class PublishRedmineWikiMojo extends AbstractMavenReport {
 		databaseUsername = info.getUserName();
 		databasePassword = info.getPassword();
 		RedmineDatabaseConnector.initializeAccessConfiguration(
-				redmineDatabaseDriver, redmineDatabaseServerURL,
-				databaseUsername, databasePassword);
+				redmineDatabaseDriver, redmineDatabaseUrl, databaseUsername,
+				databasePassword);
 	}
 
 	@Override
@@ -131,14 +134,18 @@ public class PublishRedmineWikiMojo extends AbstractMavenReport {
 
 		projectId = getProjectId();
 		wikiId = getWikiId();
-		// TODO
-		// long wikiPageId = createWikiPage("Wiki");
-		// File file = new File("src/main/resources/app-config.properties");
-		// long fileLength = file.length();
-		// Reader fileReader = (Reader) new BufferedReader(new
-		// FileReader(file));
-		// long wikiContentId = createWikiContent(wikiPageId, fileReader,
-		// (int) fileLength);
+		long wikiPageId = createWikiPage("Wiki");
+		File file = new File("design/hello.textile");
+		long fileLength = file.length();
+		Reader fileReader;
+		try {
+			fileReader = (Reader) new BufferedReader(new FileReader(file));
+			long wikiContentId = createWikiContent(wikiPageId, fileReader,
+					(int) fileLength);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 	}
 
@@ -181,7 +188,7 @@ public class PublishRedmineWikiMojo extends AbstractMavenReport {
 			PreparedStatement statement;
 			ResultSet rs = null;
 			statement = RedmineDatabaseConnector.getDbConnection()
-					.prepareStatement(Constants.SQL_GET_WIKI_BY_PROJECT_ID);
+					.prepareStatement(Constants.SQL_GET_WIKI_ID);
 			statement.setLong(1, projectId);
 			rs = statement.executeQuery();
 			if (rs.next()) {
