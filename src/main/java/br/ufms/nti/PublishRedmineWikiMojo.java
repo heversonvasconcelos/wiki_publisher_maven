@@ -9,9 +9,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.MessageFormat;
+import java.util.Collection;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.reporting.AbstractMavenReport;
@@ -135,18 +137,23 @@ public class PublishRedmineWikiMojo extends AbstractMavenReport {
 		projectId = getProjectId();
 		wikiId = getWikiId();
 		long wikiPageId = createWikiPage("Wiki");
-		File file = new File("design/hello.textile");
-		long fileLength = file.length();
-		Reader fileReader;
-		try {
-			fileReader = (Reader) new BufferedReader(new FileReader(file));
-			long wikiContentId = createWikiContent(wikiPageId, fileReader,
-					(int) fileLength);
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 
+		File designDir = new File("design");
+
+		Collection<File> files = FileUtils.listFiles(designDir,
+				new String[] { "textile" }, true);
+
+		for (File file : files) {
+			long fileLength = file.length();
+			Reader fileReader;
+			try {
+				fileReader = new BufferedReader(new FileReader(file));
+				long wikiContentId = createWikiContent(wikiPageId, fileReader,
+						(int) fileLength);
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 	/**
