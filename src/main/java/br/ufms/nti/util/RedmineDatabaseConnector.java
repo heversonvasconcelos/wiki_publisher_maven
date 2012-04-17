@@ -5,6 +5,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class RedmineDatabaseConnector {
+
 	private static Connection dbConnection;
 	private static String driverClass;
 	private static String url;
@@ -21,7 +22,6 @@ public class RedmineDatabaseConnector {
 		RedmineDatabaseConnector.url = url;
 		RedmineDatabaseConnector.username = username;
 		RedmineDatabaseConnector.password = password;
-
 	}
 
 	public static Connection getDbConnection() throws SQLException {

@@ -1,10 +1,6 @@
 package br.ufms.nti;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.Reader;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -12,6 +8,7 @@ import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.Locale;
 import java.util.ResourceBundle;
+import java.util.logging.Logger;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.artifact.manager.WagonManager;
@@ -29,7 +26,10 @@ import br.ufms.nti.util.RedmineDatabaseConnector;
  * 
  * @goal publish-redmine-wiki
  */
+@SuppressWarnings("unchecked")
 public class PublishRedmineWikiMojo extends AbstractMavenReport {
+
+	Logger _log = Logger.getLogger(PublishRedmineWikiMojo.class.getName());
 
 	/**
 	 * The Maven Wagon manager to use when obtaining server authentication
@@ -66,6 +66,14 @@ public class PublishRedmineWikiMojo extends AbstractMavenReport {
 	 * @required
 	 */
 	private String redmineDatabaseUrl;
+
+	/**
+	 * Project design directory
+	 * 
+	 * @parameter expression="${redmineDesignDir}"
+	 * @required
+	 */
+	private String designDir;
 
 	/**
 	 * Redmine database driver
@@ -112,8 +120,8 @@ public class PublishRedmineWikiMojo extends AbstractMavenReport {
 	private String databaseUsername;
 	private String databasePassword;
 
-	private long projectId;
-	private long wikiId;
+	private Long projectId;
+	private Long wikiId;
 
 	/**
 	 * Initializes Redmine database access (username, password) configuration
@@ -133,27 +141,24 @@ public class PublishRedmineWikiMojo extends AbstractMavenReport {
 	@Override
 	protected void executeReport(Locale locale) throws MavenReportException {
 		initializeRedmineDatabaseConfiguration();
-
 		projectId = getProjectId();
 		wikiId = getWikiId();
-		long wikiPageId = createWikiPage("Wiki");
 
 		File designDir = new File("design");
-
 		Collection<File> files = FileUtils.listFiles(designDir,
 				new String[] { "textile" }, true);
 
 		for (File file : files) {
-			long fileLength = file.length();
-			Reader fileReader;
-			try {
-				fileReader = new BufferedReader(new FileReader(file));
-				long wikiContentId = createWikiContent(wikiPageId, fileReader,
-						(int) fileLength);
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			}
+			Long wikiPageId = createWikiPage(file);
+			createWikiContent(wikiPageId, file);
 		}
+	}
+
+	private Long createWikiPage(File file) {
+		String wikiPageTitle = file.getName();
+		wikiPageTitle = wikiPageTitle.substring(0,
+				wikiPageTitle.lastIndexOf("textile") - 1);
+		return createWikiPage(wikiPageTitle);
 	}
 
 	/**
@@ -161,9 +166,7 @@ public class PublishRedmineWikiMojo extends AbstractMavenReport {
 	 * 
 	 * @return project id or -1 if not found
 	 */
-	private long getProjectId() {
-		long projectId = -1;
-
+	private Long getProjectId() {
 		try {
 			PreparedStatement statement;
 			ResultSet rs = null;
@@ -172,25 +175,22 @@ public class PublishRedmineWikiMojo extends AbstractMavenReport {
 			statement.setString(1, projectIdentifier);
 			rs = statement.executeQuery();
 			if (rs.next()) {
-				projectId = rs.getLong("id");
+				Long projectId = rs.getLong("id");
+				return projectId;
 			}
-
+			return null;
 		} catch (SQLException e) {
-			System.out.println("Error while trying to get project id from db: "
-					+ e.getMessage());
+			throw new RuntimeException(
+					"Error while trying to get project id from db", e);
 		}
-
-		return projectId;
 	}
 
 	/**
 	 * Gets database wiki id by project id
 	 * 
-	 * @return wiki id or -1 if not found
+	 * @return wiki id or null if not found
 	 */
-	private long getWikiId() {
-		long wikiId = -1;
-
+	private Long getWikiId() {
 		try {
 			PreparedStatement statement;
 			ResultSet rs = null;
@@ -199,27 +199,28 @@ public class PublishRedmineWikiMojo extends AbstractMavenReport {
 			statement.setLong(1, projectId);
 			rs = statement.executeQuery();
 			if (rs.next()) {
-				wikiId = rs.getLong("id");
+				Long wikiId = rs.getLong("id");
+				return wikiId;
 			}
-
+			return null;
 		} catch (SQLException e) {
-			System.out.println("Error while trying to get wiki id: "
-					+ e.getMessage());
+			throw new RuntimeException("Error while trying to get wiki id", e);
 		}
-
-		return wikiId;
 	}
 
 	/**
 	 * Creates wiki page
 	 * 
 	 * @param wikiPageTitle
-	 * @return wiki page id or -1 if not created
+	 * @return wiki page id or null if not created
 	 */
-	private long createWikiPage(String wikiPageTitle) {
-		long wikiPageId = -1;
-
+	private Long createWikiPage(String wikiPageTitle) {
 		try {
+			Long wikiPageId = getWikiPageId(wikiPageTitle);
+			if (wikiPageId != null) {
+				_log.info("WikiPage already exists: " + wikiPageTitle);
+				return wikiPageId;
+			}
 			PreparedStatement statement;
 			ResultSet rs = null;
 			statement = RedmineDatabaseConnector.getDbConnection()
@@ -230,13 +231,30 @@ public class PublishRedmineWikiMojo extends AbstractMavenReport {
 			if (rs.next()) {
 				wikiPageId = rs.getLong("id");
 			}
-
+			return wikiPageId;
 		} catch (SQLException e) {
-			System.out.println("Error while trying to create wiki page: "
-					+ e.getMessage());
+			throw new RuntimeException(
+					"Error while trying to create wiki page", e);
 		}
+	}
 
-		return wikiPageId;
+	private Long getWikiPageId(String wikiPageTitle) {
+		try {
+			PreparedStatement statement = RedmineDatabaseConnector
+					.getDbConnection().prepareStatement(
+							Constants.SQL_CREATE_WIKI_PAGE);
+			statement.setLong(1, wikiId);
+			statement.setString(2, wikiPageTitle);
+			ResultSet rs = statement.executeQuery();
+			if (rs.next()) {
+				Long wikiPageId = rs.getLong("id");
+				return wikiPageId;
+			}
+			return null;
+		} catch (Exception e) {
+			throw new RuntimeException(
+					"Error while trying to retrieve the wiki page ID", e);
+		}
 	}
 
 	/**
@@ -247,30 +265,36 @@ public class PublishRedmineWikiMojo extends AbstractMavenReport {
 	 *            Reader that contains wiki data
 	 * @param fileLength
 	 *            Length from the reader
-	 * @return wiki content id or -1 if not created
+	 * @return wiki content id or null if not created
 	 */
-	private long createWikiContent(long wikiPageId, Reader reader,
-			int fileLength) {
-		long wikiContentId = -1;
-
+	private Long createWikiContent(Long wikiPageId, File file) {
 		try {
 			PreparedStatement statement;
 			ResultSet rs = null;
 			statement = RedmineDatabaseConnector.getDbConnection()
 					.prepareStatement(Constants.SQL_CREATE_WIKI_CONTENT);
 			statement.setLong(1, wikiPageId);
-			statement.setCharacterStream(2, reader, fileLength);
+
+			String path = file.getAbsolutePath();
+			path = path.substring(path.indexOf(designDir));
+
+			StringBuilder wikiContent = new StringBuilder();
+			wikiContent.append("{{repo_include(");
+			wikiContent.append(path);
+			wikiContent.append(")}}");
+			statement.setString(2, wikiContent.toString());
+
 			rs = statement.executeQuery();
 			if (rs.next()) {
-				wikiContentId = rs.getLong("id");
+				Long wikiContentId = rs.getLong("id");
+				return wikiContentId;
 			}
-
+			return null;
 		} catch (SQLException e) {
-			System.out.println("Error while trying to create wiki page: "
-					+ e.getMessage());
+			throw new RuntimeException(
+					"Error while trying to create wiki page", e);
 		}
 
-		return wikiContentId;
 	}
 
 	protected String getMessage(Locale locale, String key, Object... params) {
