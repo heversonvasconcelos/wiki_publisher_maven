@@ -141,8 +141,8 @@ public class PublishRedmineWikiMojo extends AbstractMavenReport {
 	@Override
 	protected void executeReport(Locale locale) throws MavenReportException {
 		initializeRedmineDatabaseConfiguration();
-		projectId = getProjectId();
-		wikiId = getWikiId();
+		projectId = getProjectId(projectIdentifier);
+		wikiId = getWikiId(projectId);
 
 		File designDir = new File("design");
 		Collection<File> files = FileUtils.listFiles(designDir,
@@ -154,34 +154,26 @@ public class PublishRedmineWikiMojo extends AbstractMavenReport {
 		}
 	}
 
-	private Long createWikiPage(File file) {
-		String wikiPageTitle = file.getName();
-		wikiPageTitle = wikiPageTitle.substring(0,
-				wikiPageTitle.lastIndexOf("textile") - 1);
-		return createWikiPage(wikiPageTitle);
-	}
-
 	/**
 	 * Gets database project id by project identifier.
 	 * 
-	 * @return project id or -1 if not found
+	 * @return project id or null if not found
 	 */
-	private Long getProjectId() {
+	private Long getProjectId(String projectIdentifier) {
 		try {
-			PreparedStatement statement;
-			ResultSet rs = null;
-			statement = RedmineDatabaseConnector.getDbConnection()
-					.prepareStatement(Constants.SQL_GET_PROJECT_ID);
+			PreparedStatement statement = RedmineDatabaseConnector
+					.getDbConnection().prepareStatement(
+							Constants.SQL_GET_PROJECT_ID);
 			statement.setString(1, projectIdentifier);
-			rs = statement.executeQuery();
+			ResultSet rs = statement.executeQuery();
 			if (rs.next()) {
 				Long projectId = rs.getLong("id");
 				return projectId;
 			}
 			return null;
 		} catch (SQLException e) {
-			throw new RuntimeException(
-					"Error while trying to get project id from db", e);
+			throw new RuntimeException("Error while trying to get project id",
+					e);
 		}
 	}
 
@@ -190,14 +182,13 @@ public class PublishRedmineWikiMojo extends AbstractMavenReport {
 	 * 
 	 * @return wiki id or null if not found
 	 */
-	private Long getWikiId() {
+	private Long getWikiId(Long projectId) {
 		try {
-			PreparedStatement statement;
-			ResultSet rs = null;
-			statement = RedmineDatabaseConnector.getDbConnection()
-					.prepareStatement(Constants.SQL_GET_WIKI_ID);
+			PreparedStatement statement = RedmineDatabaseConnector
+					.getDbConnection().prepareStatement(
+							Constants.SQL_GET_WIKI_ID);
 			statement.setLong(1, projectId);
-			rs = statement.executeQuery();
+			ResultSet rs = statement.executeQuery();
 			if (rs.next()) {
 				Long wikiId = rs.getLong("id");
 				return wikiId;
@@ -209,9 +200,49 @@ public class PublishRedmineWikiMojo extends AbstractMavenReport {
 	}
 
 	/**
+	 * Gets database wiki page id by wiki page title
+	 * 
+	 * @param wikiPageTitle
+	 * @return wiki page id or null if not found
+	 */
+	private Long getWikiPageId(String wikiPageTitle) {
+		try {
+			PreparedStatement statement = RedmineDatabaseConnector
+					.getDbConnection().prepareStatement(
+							Constants.SQL_GET_WIKI_PAGE_ID);
+			statement.setString(1, wikiPageTitle);
+			ResultSet rs = statement.executeQuery();
+
+			if (rs.next()) {
+				Long wikiPageId = rs.getLong("id");
+				return wikiPageId;
+			}
+			return null;
+		} catch (Exception e) {
+			throw new RuntimeException(
+					"Error while trying to retrieve the wiki page id", e);
+		}
+	}
+
+	/**
+	 * Creates wiki page with title from a file name
+	 * 
+	 * @param file
+	 * @return wiki page id or null if not created
+	 */
+	private Long createWikiPage(File file) {
+		String wikiPageTitle = file.getName();
+		wikiPageTitle = wikiPageTitle.substring(0,
+				wikiPageTitle.lastIndexOf("textile") - 1);
+
+		return createWikiPage(wikiPageTitle);
+	}
+
+	/**
 	 * Creates wiki page
 	 * 
 	 * @param wikiPageTitle
+	 *            Wiki page title
 	 * @return wiki page id or null if not created
 	 */
 	private Long createWikiPage(String wikiPageTitle) {
@@ -221,13 +252,14 @@ public class PublishRedmineWikiMojo extends AbstractMavenReport {
 				_log.info("WikiPage already exists: " + wikiPageTitle);
 				return wikiPageId;
 			}
-			PreparedStatement statement;
-			ResultSet rs = null;
-			statement = RedmineDatabaseConnector.getDbConnection()
-					.prepareStatement(Constants.SQL_CREATE_WIKI_PAGE);
+
+			PreparedStatement statement = RedmineDatabaseConnector
+					.getDbConnection().prepareStatement(
+							Constants.SQL_CREATE_WIKI_PAGE);
 			statement.setLong(1, wikiId);
 			statement.setString(2, wikiPageTitle);
-			rs = statement.executeQuery();
+			ResultSet rs = statement.executeQuery();
+
 			if (rs.next()) {
 				wikiPageId = rs.getLong("id");
 			}
@@ -238,33 +270,13 @@ public class PublishRedmineWikiMojo extends AbstractMavenReport {
 		}
 	}
 
-	private Long getWikiPageId(String wikiPageTitle) {
-		try {
-			PreparedStatement statement = RedmineDatabaseConnector
-					.getDbConnection().prepareStatement(
-							Constants.SQL_CREATE_WIKI_PAGE);
-			statement.setLong(1, wikiId);
-			statement.setString(2, wikiPageTitle);
-			ResultSet rs = statement.executeQuery();
-			if (rs.next()) {
-				Long wikiPageId = rs.getLong("id");
-				return wikiPageId;
-			}
-			return null;
-		} catch (Exception e) {
-			throw new RuntimeException(
-					"Error while trying to retrieve the wiki page ID", e);
-		}
-	}
-
 	/**
-	 * Creates wiki content
+	 * Creates wiki page content
 	 * 
 	 * @param wikiPageId
-	 * @param reader
-	 *            Reader that contains wiki data
-	 * @param fileLength
-	 *            Length from the reader
+	 *            Wiki page id wich
+	 * @param file
+	 *            File that contains wiki data content
 	 * @return wiki content id or null if not created
 	 */
 	private Long createWikiContent(Long wikiPageId, File file) {
