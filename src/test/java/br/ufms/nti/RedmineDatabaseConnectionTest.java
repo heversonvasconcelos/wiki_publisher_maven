@@ -12,25 +12,35 @@ import java.sql.SQLException;
 import junit.framework.Assert;
 
 import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import br.ufms.nti.util.Constants;
 import br.ufms.nti.util.RedmineDatabaseConnector;
 
 public class RedmineDatabaseConnectionTest {
-	private String projectIdentifier = "projetoteste";
-	private String wikiPageTitle = "Wiki";
+	private final String projectIdentifier = "projetoteste";
+	private final String wikiPageTitle = "Wiki";
 	private long projectId;
 	private long wikiId;
+
+	@BeforeClass
+	public static void openConnection() {
+		RedmineDatabaseConnector
+				.initializeAccessConfiguration("org.postgresql.Driver",
+						"jdbc:postgresql://debianvm:5432/redmine", "redmine",
+						"redmine");
+	}
 
 	@Test
 	public void connectionTest() {
 		try {
-			PreparedStatement statement;
-			ResultSet rs = null;
+			PreparedStatement statement = RedmineDatabaseConnector
+					.getDbConnection().prepareStatement(
+							Constants.SQL_SELECT_TEST);
 			statement = RedmineDatabaseConnector.getDbConnection()
 					.prepareStatement(Constants.SQL_SELECT_TEST);
-			rs = statement.executeQuery();
+			ResultSet rs = statement.executeQuery();
 			Assert.assertNotNull(rs.next());
 
 		} catch (SQLException e) {
@@ -39,26 +49,21 @@ public class RedmineDatabaseConnectionTest {
 		}
 	}
 
-	@Test
 	public void publishWikiContent() throws FileNotFoundException {
 		projectId = getProjectId();
 		wikiId = getWikiId();
 		long wikiPageId = createWikiPage(wikiPageTitle);
 		File file = new File("src/main/resources/app-config.properties");
 		long fileLength = file.length();
-		Reader fileReader = (Reader) new BufferedReader(new FileReader(file));
+		Reader fileReader = new BufferedReader(new FileReader(file));
 		long wikiContentId = createWikiContent(wikiPageId, fileReader,
 				(int) fileLength);
 
 	}
 
 	@AfterClass
-	public static void closeConnection() {
-		try {
-			RedmineDatabaseConnector.closeDbConnection();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+	public static void closeConnection() throws SQLException {
+		RedmineDatabaseConnector.closeDbConnection();
 	}
 
 	private long getProjectId() {

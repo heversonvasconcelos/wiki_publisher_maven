@@ -138,9 +138,18 @@ public class PublishRedmineWikiMojo extends AbstractMavenReport {
 				databasePassword);
 	}
 
+	/**
+	 * Finalizes Redmine database access
+	 * 
+	 */
+	private void finalizeRedmineDatabaseAccess() throws RuntimeException {
+		RedmineDatabaseConnector.closeDbConnection();
+	}
+
 	@Override
 	protected void executeReport(Locale locale) throws MavenReportException {
 		initializeRedmineDatabaseConfiguration();
+
 		projectId = getProjectId(projectIdentifier);
 		wikiId = getWikiId(projectId);
 
@@ -152,6 +161,8 @@ public class PublishRedmineWikiMojo extends AbstractMavenReport {
 			Long wikiPageId = createWikiPage(file);
 			createWikiContent(wikiPageId, file);
 		}
+
+		finalizeRedmineDatabaseAccess();
 	}
 
 	/**

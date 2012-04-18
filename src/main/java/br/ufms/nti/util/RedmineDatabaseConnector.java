@@ -24,7 +24,7 @@ public class RedmineDatabaseConnector {
 		RedmineDatabaseConnector.password = password;
 	}
 
-	public static Connection getDbConnection() throws SQLException {
+	public static Connection getDbConnection() throws RuntimeException {
 		try {
 			Class.forName(driverClass);
 			if (dbConnection == null || dbConnection.isClosed()) {
@@ -32,21 +32,22 @@ public class RedmineDatabaseConnector {
 						password);
 			}
 		} catch (ClassNotFoundException e) {
-			System.out.println("Error while trying to find db driver");
+			throw new RuntimeException("Error while trying to find db driver",
+					e);
 		} catch (SQLException e) {
-			System.out.println("Error while trying to open db connection");
+			throw new RuntimeException(
+					"Error while trying to open db connection", e);
 		}
 		return dbConnection;
 	}
 
-	public static void closeDbConnection() throws SQLException {
+	public static void closeDbConnection() throws RuntimeException {
 		if (dbConnection != null) {
 			try {
 				dbConnection.close();
 			} catch (SQLException e) {
-				System.out
-						.println("Error while trying to close the db connection");
-				throw e;
+				throw new RuntimeException(
+						"Error while trying to close the db connection", e);
 			}
 		}
 	}
