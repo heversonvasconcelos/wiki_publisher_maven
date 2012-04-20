@@ -18,8 +18,8 @@ teve como motivação:
 Este plugin teve como referência e base o plugin Maven Redmine Plugin desenvolvido
 por Julien Eluard.
 
-> "Fastconnect Maven Site":http://opensource.fastconnect.org/projects/maven-redmine-plugin/1.1/
-> "Fastconnect Redmine":https://opensource.fastconnect.org/redmine/projects/maven-redmine-plugin
+"Fastconnect Maven Site":http://opensource.fastconnect.org/projects/maven-redmine-plugin/1.1/
+"Fastconnect Redmine":https://opensource.fastconnect.org/redmine/projects/maven-redmine-plugin
 
 h2. CONFIGURAÇÕES
 
@@ -88,6 +88,51 @@ Em caso de dúvidas do procedimento para criptografar a senha de acesso ao banco
 utilizando o maven, consulte "Maven Password Encryption":http://maven.apache.org/guides/mini/guide-encryption.html 
 
 Para maiores informações de como configurar um plugin do maven, consulte "Maven Guide to Configuring Plug-ins":http://maven.apache.org/guides/mini/guide-configuring-plugins.html
+
+h2. DEPENDÊNCIAS
+
+h3. Redmine SCMacros
+
+Este plugin faz uso de macros que não são reconhecidas pelo Redmine por padrão.
+Utiliza a função repo_include do plugin "scmacros":https://github.com/gpr/redmine_scmacros do Redmine.
+Essa função inclúi um arquivo do repositório (svn, git, etc) na wiki do projeto.
+Exemplo:
+<pre>
+{{repo_include(design/gpr/index.textile)}}
+</pre>
+
+h3. JDBC Driver
+
+Deverá ser especificado no pom.xml o driver jdbc do sgdb utilizado no Redmine.
+Exemplo:
+<pre><code class="xml">
+<build>
+	...
+	<plugins>
+		...
+		<plugin>
+			<groupId>br.ufms.nti</groupId>
+			<artifactId>nti-maven-plugin</artifactId>
+			<configuration>
+				<projectIdentifier>projetoteste</projectIdentifier>
+				<redmineDatabase>redmine-postgresql</redmineDatabase>
+				<redmineDatabaseUrl>jdbc:postgresql://debianvm:5432/redmine</redmineDatabaseUrl>
+				<redmineDatabaseDriver>org.postgresql.Driver</redmineDatabaseDriver>
+				<designDir>design</designDir>
+			</configuration>
+			<dependencies>
+				<dependency>
+					<groupId>postgresql</groupId>
+					<artifactId>postgresql</artifactId>
+					<version>9.1-901-1.jdbc4</version>
+				</dependency>
+			</dependencies>
+		</plugin>
+		...
+	</plugins>
+	...
+</build>	
+</code></pre>
 
 h2. USO
 
