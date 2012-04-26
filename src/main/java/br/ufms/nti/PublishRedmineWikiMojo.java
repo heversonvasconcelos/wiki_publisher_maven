@@ -1,35 +1,50 @@
 package br.ufms.nti;
 
 import java.io.File;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.text.MessageFormat;
 import java.util.Collection;
-import java.util.Locale;
-import java.util.ResourceBundle;
-import java.util.logging.Logger;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.artifact.manager.WagonManager;
-import org.apache.maven.project.MavenProject;
-import org.apache.maven.reporting.AbstractMavenReport;
-import org.apache.maven.reporting.MavenReportException;
+import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.wagon.authentication.AuthenticationInfo;
-import org.codehaus.doxia.site.renderer.SiteRenderer;
 
-import br.ufms.nti.util.Constants;
-import br.ufms.nti.util.RedmineDatabaseConnector;
+import br.ufms.nti.model.dao.RedmineWikiDao;
+import br.ufms.nti.model.generic.GenericRedmineWikiDao;
 
 /**
- * Goal which publish the site files to a redmine wiki database.
+ * Goal which publish the wiki files to a redmine database.
  * 
  * @goal publish-redmine-wiki
  */
 @SuppressWarnings("unchecked")
-public class PublishRedmineWikiMojo extends AbstractMavenReport {
+public class PublishRedmineWikiMojo extends AbstractMojo {
 
-	Logger _log = Logger.getLogger(PublishRedmineWikiMojo.class.getName());
+	/**
+	 * Project identifier.
+	 * 
+	 * @parameter default-value="${project.artifactId}"
+	 *            expression="${projectIdentifier}"
+	 * @required
+	 */
+	private String projectIdentifier;
+
+	/**
+	 * Project design directory
+	 * 
+	 * @parameter expression="${redmineDesignDir}"
+	 * @required
+	 */
+	private String designDir;
+
+	/**
+	 * Redmine wiki text format
+	 * 
+	 * @parameter expression="${redmineWikiTextFormat}"
+	 * @required
+	 */
+	private String redmineWikiTextFormat;
 
 	/**
 	 * The Maven Wagon manager to use when obtaining server authentication
@@ -40,15 +55,6 @@ public class PublishRedmineWikiMojo extends AbstractMavenReport {
 	 * @readonly
 	 */
 	protected WagonManager wagonManager;
-
-	/**
-	 * Project identifier.
-	 * 
-	 * @parameter default-value="${project.artifactId}"
-	 *            expression="${projectIdentifier}"
-	 * @required
-	 */
-	private String projectIdentifier;
 
 	/**
 	 * The server id in settings.xml to use when authenticating with Redmine
@@ -68,14 +74,6 @@ public class PublishRedmineWikiMojo extends AbstractMavenReport {
 	private String redmineDatabaseUrl;
 
 	/**
-	 * Project design directory
-	 * 
-	 * @parameter expression="${redmineDesignDir}"
-	 * @required
-	 */
-	private String designDir;
-
-	/**
 	 * Redmine database driver
 	 * 
 	 * @parameter expression="${redmineDatabaseDriver}"
@@ -83,288 +81,41 @@ public class PublishRedmineWikiMojo extends AbstractMavenReport {
 	 */
 	private String redmineDatabaseDriver;
 
-	/**
-	 * The maven project
-	 * 
-	 * @parameter expression="${project}"
-	 * @readonly
-	 */
-	private MavenProject project;
-
-	/**
-	 * The filename to use for the report.
-	 * 
-	 * @parameter expression="hello-report"
-	 * @readonly
-	 */
-	private String outputName;
-
-	/**
-	 * Directory containing The generated DashBoard report Datafile
-	 * "dashboard-report.xml".
-	 * 
-	 * @parameter expression="${project.reporting.outputDirectory}"
-	 * @required
-	 */
-	private File outputDirectory;
-
-	/**
-	 * Site Renderer
-	 * 
-	 * @parameter 
-	 *            expression="${component.org.codehaus.doxia.site.renderer.SiteRenderer}"
-	 * @readonly
-	 */
-	private SiteRenderer siteRenderer;
-
-	private String databaseUsername;
-	private String databasePassword;
-
 	private Long projectId;
 	private Long wikiId;
+	private GenericRedmineWikiDao redmineWikiDao;
 
-	/**
-	 * Initializes Redmine database access (username, password) configuration
-	 * 
-	 */
-	private void initializeRedmineDatabaseConfiguration() {
+	public void intializePublishRedmineWikiMojo() {
 		AuthenticationInfo info = wagonManager
 				.getAuthenticationInfo(redmineDatabase);
 
-		databaseUsername = info.getUserName();
-		databasePassword = info.getPassword();
-		RedmineDatabaseConnector.initializeAccessConfiguration(
-				redmineDatabaseDriver, redmineDatabaseUrl, databaseUsername,
-				databasePassword);
-	}
+		String redmineDatabaseUsername = info.getUserName();
+		String redmineDatabasePassword = info.getPassword();
 
-	/**
-	 * Finalizes Redmine database access
-	 * 
-	 */
-	private void finalizeRedmineDatabaseAccess() throws RuntimeException {
-		RedmineDatabaseConnector.closeDbConnection();
+		redmineWikiDao = new RedmineWikiDao();
+		redmineWikiDao.initializeAccessConfiguration(redmineDatabaseDriver,
+				redmineDatabaseUrl, redmineDatabaseUsername,
+				redmineDatabasePassword);
 	}
 
 	@Override
-	protected void executeReport(Locale locale) throws MavenReportException {
-		initializeRedmineDatabaseConfiguration();
+	public void execute() throws MojoExecutionException, MojoFailureException {
+		intializePublishRedmineWikiMojo();
 
-		projectId = getProjectId(projectIdentifier);
-		wikiId = getWikiId(projectId);
+		projectId = redmineWikiDao.getProjectId(projectIdentifier);
+		wikiId = redmineWikiDao.getWikiId(projectId);
 
-		File designDir = new File("design");
-		Collection<File> files = FileUtils.listFiles(designDir,
-				new String[] { "textile" }, true);
+		File designDirFile = new File(designDir);
+		Collection<File> files = FileUtils.listFiles(designDirFile,
+				new String[] { redmineWikiTextFormat }, true);
 
 		for (File file : files) {
-			Long wikiPageId = createWikiPage(file);
-			createWikiContent(wikiPageId, file);
+			Long wikiPageId = redmineWikiDao.createWikiPage(wikiId, file,
+					redmineWikiTextFormat);
+			redmineWikiDao.createWikiContent(designDir, wikiPageId, file);
 		}
 
-		finalizeRedmineDatabaseAccess();
-	}
-
-	/**
-	 * Gets database project id by project identifier.
-	 * 
-	 * @return project id or null if not found
-	 */
-	private Long getProjectId(String projectIdentifier) {
-		try {
-			PreparedStatement statement = RedmineDatabaseConnector
-					.getDbConnection().prepareStatement(
-							Constants.SQL_GET_PROJECT_ID);
-			statement.setString(1, projectIdentifier);
-			ResultSet rs = statement.executeQuery();
-			if (rs.next()) {
-				Long projectId = rs.getLong("id");
-				return projectId;
-			}
-			return null;
-		} catch (SQLException e) {
-			throw new RuntimeException("Error while trying to get project id",
-					e);
-		}
-	}
-
-	/**
-	 * Gets database wiki id by project id
-	 * 
-	 * @return wiki id or null if not found
-	 */
-	private Long getWikiId(Long projectId) {
-		try {
-			PreparedStatement statement = RedmineDatabaseConnector
-					.getDbConnection().prepareStatement(
-							Constants.SQL_GET_WIKI_ID);
-			statement.setLong(1, projectId);
-			ResultSet rs = statement.executeQuery();
-			if (rs.next()) {
-				Long wikiId = rs.getLong("id");
-				return wikiId;
-			}
-			return null;
-		} catch (SQLException e) {
-			throw new RuntimeException("Error while trying to get wiki id", e);
-		}
-	}
-
-	/**
-	 * Gets database wiki page id by wiki page title
-	 * 
-	 * @param wikiPageTitle
-	 * @return wiki page id or null if not found
-	 */
-	private Long getWikiPageId(String wikiPageTitle) {
-		try {
-			PreparedStatement statement = RedmineDatabaseConnector
-					.getDbConnection().prepareStatement(
-							Constants.SQL_GET_WIKI_PAGE_ID);
-			statement.setString(1, wikiPageTitle);
-			ResultSet rs = statement.executeQuery();
-
-			if (rs.next()) {
-				Long wikiPageId = rs.getLong("id");
-				return wikiPageId;
-			}
-			return null;
-		} catch (Exception e) {
-			throw new RuntimeException(
-					"Error while trying to retrieve the wiki page id", e);
-		}
-	}
-
-	/**
-	 * Creates wiki page with title from a file name
-	 * 
-	 * @param file
-	 * @return wiki page id or null if not created
-	 */
-	private Long createWikiPage(File file) {
-		String wikiPageTitle = file.getName();
-		wikiPageTitle = wikiPageTitle.substring(0,
-				wikiPageTitle.lastIndexOf("textile") - 1);
-
-		return createWikiPage(wikiPageTitle);
-	}
-
-	/**
-	 * Creates wiki page
-	 * 
-	 * @param wikiPageTitle
-	 *            Wiki page title
-	 * @return wiki page id or null if not created
-	 */
-	private Long createWikiPage(String wikiPageTitle) {
-		try {
-			Long wikiPageId = getWikiPageId(wikiPageTitle);
-			if (wikiPageId != null) {
-				_log.info("WikiPage already exists: " + wikiPageTitle);
-				return wikiPageId;
-			}
-
-			PreparedStatement statement = RedmineDatabaseConnector
-					.getDbConnection().prepareStatement(
-							Constants.SQL_CREATE_WIKI_PAGE);
-			statement.setLong(1, wikiId);
-			statement.setString(2, wikiPageTitle);
-			ResultSet rs = statement.executeQuery();
-
-			if (rs.next()) {
-				wikiPageId = rs.getLong("id");
-			}
-			return wikiPageId;
-		} catch (SQLException e) {
-			throw new RuntimeException(
-					"Error while trying to create wiki page", e);
-		}
-	}
-
-	/**
-	 * Creates wiki page content
-	 * 
-	 * @param wikiPageId
-	 *            Wiki page id wich
-	 * @param file
-	 *            File that contains wiki data content
-	 * @return wiki content id or null if not created
-	 */
-	private Long createWikiContent(Long wikiPageId, File file) {
-		try {
-			PreparedStatement statement;
-			ResultSet rs = null;
-			statement = RedmineDatabaseConnector.getDbConnection()
-					.prepareStatement(Constants.SQL_CREATE_WIKI_CONTENT);
-			statement.setLong(1, wikiPageId);
-
-			String path = file.getAbsolutePath();
-			path = path.substring(path.indexOf(designDir));
-
-			StringBuilder wikiContent = new StringBuilder();
-			wikiContent.append("{{repo_include(");
-			wikiContent.append(path);
-			wikiContent.append(")}}");
-			statement.setString(2, wikiContent.toString());
-
-			rs = statement.executeQuery();
-			if (rs.next()) {
-				Long wikiContentId = rs.getLong("id");
-				return wikiContentId;
-			}
-			return null;
-		} catch (SQLException e) {
-			throw new RuntimeException(
-					"Error while trying to create wiki page", e);
-		}
-
-	}
-
-	protected String getMessage(Locale locale, String key, Object... params) {
-		String text = ResourceBundle.getBundle("messages", locale,
-				this.getClass().getClassLoader()).getString(key);
-		if (params != null) {
-			return getParameterizedMessage(text, locale, params);
-		}
-		return text;
-	}
-
-	protected String getParameterizedMessage(String message, Locale locale,
-			Object[] params) {
-		MessageFormat messageFormat = new MessageFormat(message, locale);
-		message = messageFormat.format(params, new StringBuffer(), null)
-				.toString();
-		return message;
-	}
-
-	@Override
-	public String getOutputName() {
-		return outputName;
-	}
-
-	@Override
-	public String getName(Locale locale) {
-		return getMessage(locale, "redmine-wiki-name");
-	}
-
-	@Override
-	public String getDescription(Locale locale) {
-		return getMessage(locale, "redmine-wiki-description");
-	}
-
-	@Override
-	protected SiteRenderer getSiteRenderer() {
-		return siteRenderer;
-	}
-
-	@Override
-	protected String getOutputDirectory() {
-		return outputDirectory.getName();
-	}
-
-	@Override
-	protected MavenProject getProject() {
-		return project;
+		redmineWikiDao.finalizeRedmineDatabaseAccess();
 	}
 
 }
