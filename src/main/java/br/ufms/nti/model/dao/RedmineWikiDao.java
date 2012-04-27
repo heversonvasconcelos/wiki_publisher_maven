@@ -62,7 +62,8 @@ public class RedmineWikiDao extends GenericRedmineWikiDao {
 			Long wikiContentId = null;
 			PreparedStatement statement;
 			statement = RedmineDatabaseConnector.getDbConnection()
-					.prepareStatement(SQL_CREATE_WIKI_CONTENT);
+					.prepareStatement(SQL_CREATE_WIKI_CONTENT,
+							Statement.RETURN_GENERATED_KEYS);
 			statement.setLong(1, wikiPageId);
 			statement.setString(2, wikiContentData.toString());
 
