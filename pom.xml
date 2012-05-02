@@ -31,6 +31,13 @@
 			<organizationUrl>http://ufms.br</organizationUrl>
 			<timezone>-4</timezone>
 		</developer>
+		<developer>
+			<id>vinicius.souza</id>
+			<email>vinicius.souza@ufms.br</email>
+			<organization>UFMS</organization>
+			<organizationUrl>http://ufms.br</organizationUrl>
+			<timezone>-4</timezone>
+		</developer>
 	</developers>
 
 	<properties>
@@ -74,7 +81,7 @@
 			<artifactId>commons-io</artifactId>
 			<groupId>org.apache.commons</groupId>
 			<version>1.3.2</version>
-		</dependency>
+		</dependency>		
 		<dependency>
 			<groupId>postgresql</groupId>
 			<artifactId>postgresql</artifactId>

@@ -2,31 +2,29 @@ h1. NTI Maven Plugin
 
 {{>TOC}}
 
-h2. DESCRIÇÃO
+h2. DESCRIPTION
 
-O plugin do maven NTI Maven Plugin tem como objetivo auxiliar a publicação
-da documentação na Wiki do Redmine de um determinado projeto. O seu desenvolvimento
-teve como motivação:
+The Maven Plugin NTI maven plugin is intended to assist on documentation publishing
+in the Redmine wiki of a particular project. Your development had as motivation:
 
-* Eliminar a necessidade de um site específico para a documentação e relatórios
-	como é feito no atual plugin site do maven. Deste modo a documentação fica
-	centralizada com a gerência do projeto no Redmine.
+* Eliminate the need for a specific site for documentation and reports as is done
+ 	in the current site plugin of the maven. Thus, the documentation stays centralized 
+ 	with the project management on Redmine.
 
-* Poder que macros da Wiki oferecem na integração dos artefatos da documentação
-	do projeto com tarefas, repositório svn e outras funcionalidades do Redmine.
-
-Este plugin teve como referência e base o plugin Maven Redmine Plugin desenvolvido
-por Julien Eluard.
+* Power that Wiki macros provide in the integration of project documentation artifacts 
+	with tasks, svn repository and other features of Redmine.
+	
+This plugin had as reference and base, the Maven Redmine plugin, developed by Julien Eluard.
 
 "Fastconnect Maven Site":http://opensource.fastconnect.org/projects/maven-redmine-plugin/1.1/
 "Fastconnect Redmine":https://opensource.fastconnect.org/redmine/projects/maven-redmine-plugin
 
-h2. CONFIGURAÇÕES
+h2. CONFIGURATIONS
 
 h3. pom.xml
 
-A maioria dos parâmetros utilizados no plugin é configurado a partir do arquivo pom.xml.
-Exemplo:
+Most parameters used in the plugin is configured from the pom.xml file.
+Example:
 <pre><code class="xml">
 <project>
 	...
@@ -60,8 +58,8 @@ Exemplo:
 
 h3. {maven2configurationpath}/settings.xml
 
-* Neste arquivo deverá ser configurado a tag <pluginGroup> com o valor br.ufms.nti.
-Exemplo:
+* In this file, should be configured the <pluginGroup> tag with the value br.ufms.nti.
+Example:
 <pre><code class="xml">
 <pluginGroups>
 	...
@@ -70,9 +68,9 @@ Exemplo:
 </pluginGroups>
 </code></pre>
 
-* As configurações de acesso ao banco de dados do redmine deverão ser configuradas
-no arquivo settings.xml. Deste modo é possível armazenar as senhas criptografadas.
-Exemplo:
+* The redmine database access configurations should be configured in the settings.xml. 
+	Thus it is possible to store the encrypted passwords.
+Example:
 <pre><code class="xml">
 <servers>
 	...
@@ -85,27 +83,26 @@ Exemplo:
 </servers>
 </code></pre>
 
-Em caso de dúvidas do procedimento para criptografar a senha de acesso ao banco
-utilizando o maven, consulte "Maven Password Encryption":http://maven.apache.org/guides/mini/guide-encryption.html
+In case of questions on the procedure to encrypt the database access password using maven, see "Maven Password Encryption":http://maven.apache.org/guides/mini/guide-encryption.html
 
-Para maiores informações de como configurar um plugin do maven, consulte "Maven Guide to Configuring Plug-ins":http://maven.apache.org/guides/mini/guide-configuring-plugins.html
+For more information on how to configure a maven plugin, see "Maven Guide to Configuring Plug-ins":http://maven.apache.org/guides/mini/guide-configuring-plugins.html
 
-h2. DEPENDÊNCIAS
+h2. DEPENDENCIES
 
 h3. Redmine SCMacros
 
-Esse plugin faz uso de macros que não são reconhecidas pelo Redmine por padrão.
-Utiliza a função repo_include do plugin "scmacros":https://github.com/gpr/redmine_scmacros do Redmine.
-Essa função inclui um arquivo do repositório (svn, git, etc) na wiki do projeto.
-Exemplo:
+This plugin makes use of macros that are not recognized by Redmine by default.
+Uses the repo_include function of the "scmacros":https://github.com/gpr/redmine_scmacros of Redmine.
+This function includes a file from repository (svn, git, etc) in the project wiki.
+Example:
 <pre>
 {{repo_include(design/gpr/index.textile)}}
 </pre>
 
 h3. JDBC Driver
 
-Deverá ser especificado no pom.xml o driver jdbc do sgdb utilizado no Redmine.
-Exemplo:
+Should be specified on pom.xml the jdbc driver of the sgbd used by redmine.
+Example:
 <pre><code class="xml">
 <build>
 	...
@@ -136,14 +133,14 @@ Exemplo:
 </build>
 </code></pre>
 
-h2. USO
+h2. USAGE
 
 h3. Goals
 
 * publish-redmine-wiki
-> Publica a documentação do projeto na Wiki do Redmine. O plugin irá exportar o conteúdo do diretório configurado na tag <designDir> na sessão de configurações do pom.xml.
+> Publish the project documentation in the Redmine wiki. The plugin will export the contents of the folder configured on <designDir> tag, in the configuration session of the pom.xml.
 
-h3. Como executar
+h3. How to execute
 
 * publish-redmine-wiki
 <pre>
