@@ -1,11 +1,11 @@
 package br.ufms.nti.model.dao;
 
 import java.io.File;
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.util.Calendar;
 
 import br.ufms.nti.model.generic.GenericRedmineWikiDao;
@@ -21,8 +21,8 @@ public class RedmineWikiDao extends GenericRedmineWikiDao {
 		return RedmineWikiDao.class;
 	}
 
-	private Date getCurrentTime() {
-		return new Date(Calendar.getInstance().getTime().getTime());
+	private Timestamp getCurrentTime() {
+		return new Timestamp(Calendar.getInstance().getTime().getTime());
 	}
 
 	@Override
@@ -39,7 +39,7 @@ public class RedmineWikiDao extends GenericRedmineWikiDao {
 							Statement.RETURN_GENERATED_KEYS);
 			statement.setLong(1, wikiId);
 			statement.setString(2, wikiPageTitle);
-			statement.setDate(3, getCurrentTime());
+			statement.setTimestamp(3, getCurrentTime());
 
 			int affectedRows = statement.executeUpdate();
 			if (affectedRows != 1) {
@@ -73,7 +73,7 @@ public class RedmineWikiDao extends GenericRedmineWikiDao {
 							Statement.RETURN_GENERATED_KEYS);
 			statement.setLong(1, wikiPageId);
 			statement.setString(2, wikiContentData.toString());
-			statement.setDate(3, getCurrentTime());
+			statement.setTimestamp(3, getCurrentTime());
 
 			int affectedRows = statement.executeUpdate();
 			if (affectedRows != 1) {
