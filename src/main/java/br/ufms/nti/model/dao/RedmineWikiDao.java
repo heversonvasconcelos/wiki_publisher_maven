@@ -1,22 +1,28 @@
 package br.ufms.nti.model.dao;
 
 import java.io.File;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Calendar;
 
 import br.ufms.nti.model.generic.GenericRedmineWikiDao;
 import br.ufms.nti.util.RedmineDatabaseConnector;
 
 public class RedmineWikiDao extends GenericRedmineWikiDao {
 
-	protected static final String SQL_CREATE_WIKI_PAGE = "INSERT INTO wiki_pages (wiki_id, title, created_on, protected) VALUES (?, ?, now(), false)";
-	protected static final String SQL_CREATE_WIKI_CONTENT = "INSERT INTO wiki_contents (page_id, text, updated_on, version) VALUES (?, ?, now(), 1)";
+	protected static final String SQL_CREATE_WIKI_PAGE = "INSERT INTO wiki_pages (wiki_id, title, created_on, protected) VALUES (?, ?, ?, false)";
+	protected static final String SQL_CREATE_WIKI_CONTENT = "INSERT INTO wiki_contents (page_id, text, updated_on, version) VALUES (?, ?, ?, 1)";
 
 	@Override
 	public Class<?> getDomainClass() {
 		return RedmineWikiDao.class;
+	}
+
+	private Date getCurrentTime() {
+		return new Date(Calendar.getInstance().getTime().getTime());
 	}
 
 	@Override
@@ -33,6 +39,7 @@ public class RedmineWikiDao extends GenericRedmineWikiDao {
 							Statement.RETURN_GENERATED_KEYS);
 			statement.setLong(1, wikiId);
 			statement.setString(2, wikiPageTitle);
+			statement.setDate(3, getCurrentTime());
 
 			int affectedRows = statement.executeUpdate();
 			if (affectedRows != 1) {
@@ -66,6 +73,7 @@ public class RedmineWikiDao extends GenericRedmineWikiDao {
 							Statement.RETURN_GENERATED_KEYS);
 			statement.setLong(1, wikiPageId);
 			statement.setString(2, wikiContentData.toString());
+			statement.setDate(3, getCurrentTime());
 
 			int affectedRows = statement.executeUpdate();
 			if (affectedRows != 1) {

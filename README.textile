@@ -41,6 +41,7 @@ Exemplo:
 					<redmineDatabaseUrl>jdbc:postgresql://debianvm:5432/redmine</redmineDatabaseUrl>
 					<redmineDatabaseDriver>org.postgresql.Driver</redmineDatabaseDriver>
 					<designDir>design</designDir>
+					<redmineWikiTextFormat>textile</redmineWikiTextFormat>
 				</configuration>
 				<dependencies>
 					<dependency>
@@ -70,7 +71,7 @@ Exemplo:
 </code></pre>
 
 * As configurações de acesso ao banco de dados do redmine deverão ser configuradas
-no arquivo settings.xml. Deste modo é possível armazenar as senhas encriptografadas.
+no arquivo settings.xml. Deste modo é possível armazenar as senhas criptografadas.
 Exemplo:
 <pre><code class="xml">
 <servers>
@@ -81,11 +82,11 @@ Exemplo:
 		<password>{Kv/Gx43kBVEH8S8TB2LSy3umlM53U8aVaxpWGN/O0Jo=}</password>
 	</server>
 	...
-</servers>	
+</servers>
 </code></pre>
 
 Em caso de dúvidas do procedimento para criptografar a senha de acesso ao banco
-utilizando o maven, consulte "Maven Password Encryption":http://maven.apache.org/guides/mini/guide-encryption.html 
+utilizando o maven, consulte "Maven Password Encryption":http://maven.apache.org/guides/mini/guide-encryption.html
 
 Para maiores informações de como configurar um plugin do maven, consulte "Maven Guide to Configuring Plug-ins":http://maven.apache.org/guides/mini/guide-configuring-plugins.html
 
@@ -119,6 +120,7 @@ Exemplo:
 				<redmineDatabaseUrl>jdbc:postgresql://debianvm:5432/redmine</redmineDatabaseUrl>
 				<redmineDatabaseDriver>org.postgresql.Driver</redmineDatabaseDriver>
 				<designDir>design</designDir>
+				<redmineWikiTextFormat>textile</redmineWikiTextFormat>
 			</configuration>
 			<dependencies>
 				<dependency>
@@ -131,13 +133,13 @@ Exemplo:
 		...
 	</plugins>
 	...
-</build>	
+</build>
 </code></pre>
 
 h2. USO
 
 h3. Goals
-	
+
 * publish-redmine-wiki
 > Publica a documentação do projeto na Wiki do Redmine. O plugin irá exportar o conteúdo do diretório configurado na tag <designDir> na sessão de configurações do pom.xml.
 
@@ -146,4 +148,4 @@ h3. Como executar
 * publish-redmine-wiki
 <pre>
 mvn br.ufms.nti:nti-maven-plugin:publish-redmine-wiki
-</pre>	
+</pre>

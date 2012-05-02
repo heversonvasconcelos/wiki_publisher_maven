@@ -15,7 +15,7 @@ import br.ufms.nti.model.generic.GenericRedmineWikiDao;
 
 /**
  * Goal which publish the wiki files to a redmine database.
- *
+ * 
  * @goal publish-redmine-wiki
  */
 @SuppressWarnings("unchecked")
@@ -23,7 +23,7 @@ public class PublishRedmineWikiMojo extends AbstractMojo {
 
 	/**
 	 * Project identifier.
-	 *
+	 * 
 	 * @parameter default-value="${project.artifactId}"
 	 *            expression="${projectIdentifier}"
 	 * @required
@@ -32,15 +32,15 @@ public class PublishRedmineWikiMojo extends AbstractMojo {
 
 	/**
 	 * Project design directory
-	 *
+	 * 
 	 * @parameter expression="${redmineDesignDir}"
 	 * @required
 	 */
 	private String designDir;
 
 	/**
-	 * Redmine wiki text format
-	 *
+	 * Redmine wiki text format. Ex.: Textile, MediaWiki
+	 * 
 	 * @parameter expression="${redmineWikiTextFormat}"
 	 * @required
 	 */
@@ -49,7 +49,7 @@ public class PublishRedmineWikiMojo extends AbstractMojo {
 	/**
 	 * The Maven Wagon manager to use when obtaining server authentication
 	 * details.
-	 *
+	 * 
 	 * @component role="org.apache.maven.artifact.manager.WagonManager"
 	 * @required
 	 * @readonly
@@ -59,7 +59,7 @@ public class PublishRedmineWikiMojo extends AbstractMojo {
 	/**
 	 * The server id in settings.xml to use when authenticating with Redmine
 	 * database.
-	 *
+	 * 
 	 * @parameter expression="${redmineDatabase}"
 	 * @required
 	 */
@@ -67,7 +67,7 @@ public class PublishRedmineWikiMojo extends AbstractMojo {
 
 	/**
 	 * Redmine database url
-	 *
+	 * 
 	 * @parameter expression="${redmineDatabaseUrl}"
 	 * @required
 	 */
@@ -75,7 +75,7 @@ public class PublishRedmineWikiMojo extends AbstractMojo {
 
 	/**
 	 * Redmine database driver
-	 *
+	 * 
 	 * @parameter expression="${redmineDatabaseDriver}"
 	 * @required
 	 */
