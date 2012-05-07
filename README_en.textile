@@ -11,7 +11,7 @@ in the Redmine wiki of a particular project. Your development had as motivation:
  	in the current site plugin of the maven. Thus, the documentation stays centralized 
  	with the project management on Redmine.
 
-* Power that Wiki macros provide in the integration of project documentation artifacts 
+* Support that Wiki macros provide in the integration of project documentation artifacts 
 	with tasks, svn repository and other features of Redmine.
 	
 This plugin had as reference and base, the Maven Redmine plugin, developed by Julien Eluard.

@@ -12,7 +12,7 @@ teve como motivação:
 	como é feito no atual plugin site do maven. Deste modo a documentação fica
 	centralizada com a gerência do projeto no Redmine.
 
-* Poder que macros da Wiki oferecem na integração dos artefatos da documentação
+* Recursos que macros da Wiki oferecem na integração dos artefatos da documentação
 	do projeto com tarefas, repositório svn e outras funcionalidades do Redmine.
 
 Este plugin teve como referência e base o plugin Maven Redmine Plugin desenvolvido
