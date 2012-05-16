@@ -42,6 +42,7 @@ public interface RedmineWikiDaoInterface {
 	 *            Wiki page title
 	 * @return wiki page id or null if not created
 	 */
-	public Long createWikiContent(String designDir, Long wikiPageId, File file);
+	public Long createWikiContent(String designDir, String designSCMDir,
+			Long wikiPageId, File file);
 
 }

@@ -111,9 +111,10 @@ public abstract class GenericRedmineWikiDao implements RedmineWikiDaoInterface {
 	protected abstract Long createWikiPage(Long wikiId, String wikiPageTitle);
 
 	@Override
-	public Long createWikiContent(String designDir, Long wikiPageId, File file) {
+	public Long createWikiContent(String designDir, String designSCMDir,
+			Long wikiPageId, File file) {
 		String path = file.getAbsolutePath();
-		path = path.substring(path.indexOf(designDir));
+		path = designSCMDir + "/" + path.substring(path.indexOf(designDir));
 
 		StringBuilder wikiContentData = new StringBuilder();
 		wikiContentData.append("{{repo_include(");

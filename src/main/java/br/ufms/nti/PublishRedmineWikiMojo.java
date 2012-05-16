@@ -31,18 +31,24 @@ public class PublishRedmineWikiMojo extends AbstractMojo {
 	private String projectIdentifier;
 
 	/**
-	 * Project design directory
+	 * Project design directory wich store the documentation. Example: design
 	 * 
-	 * @parameter expression="${redmineDesignDir}"
-	 * @required
+	 * @parameter expression="${designDir}" default-value="design"
 	 */
 	private String designDir;
 
 	/**
-	 * Redmine wiki text format. Ex.: Textile, MediaWiki
+	 * Project SCM (Source Control Management) directory where designDir is.
+	 * Example: trunk
 	 * 
-	 * @parameter expression="${redmineWikiTextFormat}"
-	 * @required
+	 * @parameter expression="${designSCMDir}" default-value="trunk"
+	 */
+	private String designSCMDir;
+
+	/**
+	 * Redmine wiki text format. Example: Textile, MediaWiki
+	 * 
+	 * @parameter expression="${redmineWikiTextFormat}" default-value="textile"
 	 */
 	private String redmineWikiTextFormat;
 
@@ -112,7 +118,8 @@ public class PublishRedmineWikiMojo extends AbstractMojo {
 		for (File file : files) {
 			Long wikiPageId = redmineWikiDao.createWikiPage(wikiId, file,
 					redmineWikiTextFormat);
-			redmineWikiDao.createWikiContent(designDir, wikiPageId, file);
+			redmineWikiDao.createWikiContent(designDir, designSCMDir,
+					wikiPageId, file);
 		}
 
 		redmineWikiDao.finalizeRedmineDatabaseAccess();
