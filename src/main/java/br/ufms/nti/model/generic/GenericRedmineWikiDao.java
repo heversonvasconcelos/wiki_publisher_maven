@@ -16,7 +16,7 @@ public abstract class GenericRedmineWikiDao implements RedmineWikiDaoInterface {
 
 	protected static final String SQL_GET_PROJECT_ID = "SELECT id FROM projects WHERE identifier = ?";
 	protected static final String SQL_GET_WIKI_ID = "SELECT id FROM wikis WHERE project_id = ?";
-	protected static final String SQL_GET_WIKI_PAGE_ID = "SELECT id FROM wiki_pages WHERE title = ?";
+	protected static final String SQL_GET_WIKI_PAGE_ID = "SELECT id FROM wiki_pages WHERE wiki_id = ? AND title = ?";
 
 	public GenericRedmineWikiDao() {
 		_log = Logger.getLogger(getDomainClass().getName());
@@ -80,11 +80,12 @@ public abstract class GenericRedmineWikiDao implements RedmineWikiDaoInterface {
 	}
 
 	@Override
-	public Long getWikiPageId(String wikiPageTitle) {
+	public Long getWikiPageId(Long wikiId, String wikiPageTitle) {
 		try {
 			PreparedStatement statement = RedmineDatabaseConnector
 					.getDbConnection().prepareStatement(SQL_GET_WIKI_PAGE_ID);
-			statement.setString(1, wikiPageTitle);
+			statement.setLong(1, wikiId);
+			statement.setString(2, wikiPageTitle);
 			ResultSet rs = statement.executeQuery();
 
 			if (rs.next()) {
@@ -110,6 +111,10 @@ public abstract class GenericRedmineWikiDao implements RedmineWikiDaoInterface {
 
 	protected abstract Long createWikiPage(Long wikiId, String wikiPageTitle);
 
+	private String fixDirectoryOSPattern(String path) {
+		return path.replace("\\", "/");
+	}
+
 	@Override
 	public Long createWikiContent(String designDir, String designSCMDir,
 			Long wikiPageId, File file) {
@@ -118,7 +123,7 @@ public abstract class GenericRedmineWikiDao implements RedmineWikiDaoInterface {
 
 		StringBuilder wikiContentData = new StringBuilder();
 		wikiContentData.append("{{repo_include(");
-		wikiContentData.append(path);
+		wikiContentData.append(fixDirectoryOSPattern(path));
 		wikiContentData.append(")}}");
 
 		return createWikiContent(wikiPageId, wikiContentData, file);

@@ -36,12 +36,11 @@ Exemplo:
 				<groupId>br.ufms.nti</groupId>
 				<artifactId>nti-maven-plugin</artifactId>
 				<configuration>
-					<projectIdentifier>projetoteste</projectIdentifier>
+					<projectIdentifier>${project.artifactId}</projectIdentifier>
 					<redmineDatabase>redmine-postgresql</redmineDatabase>
 					<redmineDatabaseUrl>jdbc:postgresql://debianvm:5432/redmine</redmineDatabaseUrl>
 					<redmineDatabaseDriver>org.postgresql.Driver</redmineDatabaseDriver>
 					<designDir>design</designDir>
-					<redmineWikiTextFormat>textile</redmineWikiTextFormat>
 				</configuration>
 				<dependencies>
 					<dependency>

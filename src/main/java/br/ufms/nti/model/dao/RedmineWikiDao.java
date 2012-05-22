@@ -28,10 +28,10 @@ public class RedmineWikiDao extends GenericRedmineWikiDao {
 	@Override
 	protected Long createWikiPage(Long wikiId, String wikiPageTitle) {
 		try {
-			Long wikiPageId = getWikiPageId(wikiPageTitle);
+			Long wikiPageId = getWikiPageId(wikiId, wikiPageTitle);
 			if (wikiPageId != null) {
 				_log.info("WikiPage already exists: " + wikiPageTitle);
-				return wikiPageId;
+				return null;
 			}
 
 			PreparedStatement statement = RedmineDatabaseConnector

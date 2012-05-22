@@ -19,12 +19,12 @@ public interface RedmineWikiDaoInterface {
 	public Long getWikiId(Long projectId);
 
 	/**
-	 * Gets database wiki page id by wiki page title
+	 * Gets database wiki page id by wiki id and page title
 	 * 
 	 * @param wikiPageTitle
 	 * @return wiki page id or null if not found
 	 */
-	public Long getWikiPageId(String wikiPageTitle);
+	public Long getWikiPageId(Long wikiId, String wikiPageTitle);
 
 	/**
 	 * Creates wiki page with title from a file name

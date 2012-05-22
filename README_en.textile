@@ -8,12 +8,12 @@ The Maven Plugin NTI maven plugin is intended to assist on documentation publish
 in the Redmine wiki of a particular project. Your development had as motivation:
 
 * Eliminate the need for a specific site for documentation and reports as is done
- 	in the current site plugin of the maven. Thus, the documentation stays centralized 
+ 	in the current site plugin of the maven. Thus, the documentation stays centralized
  	with the project management on Redmine.
 
-* Support that Wiki macros provide in the integration of project documentation artifacts 
+* Support that Wiki macros provide in the integration of project documentation artifacts
 	with tasks, svn repository and other features of Redmine.
-	
+
 This plugin had as reference and base, the Maven Redmine plugin, developed by Julien Eluard.
 
 "Fastconnect Maven Site":http://opensource.fastconnect.org/projects/maven-redmine-plugin/1.1/
@@ -34,12 +34,11 @@ Example:
 				<groupId>br.ufms.nti</groupId>
 				<artifactId>nti-maven-plugin</artifactId>
 				<configuration>
-					<projectIdentifier>projetoteste</projectIdentifier>
+					<projectIdentifier>${project.artifactId}</projectIdentifier>
 					<redmineDatabase>redmine-postgresql</redmineDatabase>
 					<redmineDatabaseUrl>jdbc:postgresql://debianvm:5432/redmine</redmineDatabaseUrl>
 					<redmineDatabaseDriver>org.postgresql.Driver</redmineDatabaseDriver>
 					<designDir>design</designDir>
-					<redmineWikiTextFormat>textile</redmineWikiTextFormat>
 				</configuration>
 				<dependencies>
 					<dependency>
@@ -68,7 +67,7 @@ Example:
 </pluginGroups>
 </code></pre>
 
-* The redmine database access configurations should be configured in the settings.xml. 
+* The redmine database access configurations should be configured in the settings.xml.
 	Thus it is possible to store the encrypted passwords.
 Example:
 <pre><code class="xml">

@@ -118,8 +118,10 @@ public class PublishRedmineWikiMojo extends AbstractMojo {
 		for (File file : files) {
 			Long wikiPageId = redmineWikiDao.createWikiPage(wikiId, file,
 					redmineWikiTextFormat);
-			redmineWikiDao.createWikiContent(designDir, designSCMDir,
-					wikiPageId, file);
+			if (wikiPageId != null) {
+				redmineWikiDao.createWikiContent(designDir, designSCMDir,
+						wikiPageId, file);
+			}
 		}
 
 		redmineWikiDao.finalizeRedmineDatabaseAccess();
