@@ -8,12 +8,9 @@ O Redmine Publisher é um plugin do Maven 2 que tem como objetivo auxiliar a pub
 da documentação na Wiki do Redmine de um determinado projeto. O seu desenvolvimento
 teve como motivação:
 
-* Eliminar a necessidade de um site específico para a documentação e relatórios
-	como é feito no atual plugin site do maven. Deste modo a documentação fica
-	centralizada com a gerência do projeto no Redmine.
+* Eliminar a necessidade de um site específico para a documentação e relatórios como é feito no atual plugin site do maven. Deste modo a documentação fica centralizada com a gerência do projeto no Redmine.
 
-* Recursos que macros da Wiki oferecem na integração dos artefatos da documentação
-	do projeto com tarefas, repositório svn e outras funcionalidades do Redmine.
+* Recursos que macros da Wiki oferecem na integração dos artefatos da documentação do projeto com tarefas, repositório svn e outras funcionalidades do Redmine.
 
 Este plugin teve como referência e base o plugin Maven Redmine Plugin desenvolvido
 por Julien Eluard.
@@ -139,7 +136,7 @@ h2. USO
 h3. Goals
 
 * publish-wiki
-> Publica a documentação do projeto na Wiki do Redmine. O plugin irá exportar o conteúdo do diretório configurado na tag <designDir> na sessão de configurações do pom.xml.
+> Publica a documentação do projeto na Wiki do Redmine. O Redmine Publisher irá exportar o conteúdo do diretório configurado na tag <designDir> (seção de configurações do plugin no pom.xml), para páginas wiki.
 
 h3. Como executar
 
