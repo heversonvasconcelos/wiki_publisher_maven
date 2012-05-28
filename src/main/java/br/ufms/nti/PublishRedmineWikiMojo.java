@@ -16,7 +16,7 @@ import br.ufms.nti.model.generic.GenericRedmineWikiDao;
 /**
  * Goal which publish the wiki files to a redmine database.
  * 
- * @goal publish-redmine-wiki
+ * @goal publish-wiki
  */
 @SuppressWarnings("unchecked")
 public class PublishRedmineWikiMojo extends AbstractMojo {
@@ -94,6 +94,12 @@ public class PublishRedmineWikiMojo extends AbstractMojo {
 	public void intializePublishRedmineWikiMojo() {
 		AuthenticationInfo info = wagonManager
 				.getAuthenticationInfo(redmineDatabase);
+
+		if (info == null) {
+			throw new RuntimeException(
+					"Error while trying to get redmine database access configuration in the file"
+							+ " {maven2_installation_path}/conf/settings.xml");
+		}
 
 		String redmineDatabaseUsername = info.getUserName();
 		String redmineDatabasePassword = info.getPassword();

@@ -1,10 +1,10 @@
-h1. NTI Maven Plugin
+h1. Redmine Publisher
 
 {{>TOC}}
 
 h2. DESCRIÇÃO
 
-O plugin do maven NTI Maven Plugin tem como objetivo auxiliar a publicação
+O Redmine Publisher é um plugin do Maven 2 que tem como objetivo auxiliar a publicação
 da documentação na Wiki do Redmine de um determinado projeto. O seu desenvolvimento
 teve como motivação:
 
@@ -57,7 +57,7 @@ Exemplo:
 </project>
 </code></pre>
 
-h3. {maven2configurationpath}/settings.xml
+h3. {maven2_installation_path}/conf/settings.xml
 
 * Neste arquivo deverá ser configurado a tag <pluginGroup> com o valor br.ufms.nti.
 Exemplo:
@@ -114,12 +114,11 @@ Exemplo:
 			<groupId>br.ufms.nti</groupId>
 			<artifactId>nti-maven-plugin</artifactId>
 			<configuration>
-				<projectIdentifier>projetoteste</projectIdentifier>
+				<projectIdentifier>${project.artifactId}</projectIdentifier>
 				<redmineDatabase>redmine-postgresql</redmineDatabase>
 				<redmineDatabaseUrl>jdbc:postgresql://debianvm:5432/redmine</redmineDatabaseUrl>
 				<redmineDatabaseDriver>org.postgresql.Driver</redmineDatabaseDriver>
 				<designDir>design</designDir>
-				<redmineWikiTextFormat>textile</redmineWikiTextFormat>
 			</configuration>
 			<dependencies>
 				<dependency>
@@ -139,12 +138,12 @@ h2. USO
 
 h3. Goals
 
-* publish-redmine-wiki
+* publish-wiki
 > Publica a documentação do projeto na Wiki do Redmine. O plugin irá exportar o conteúdo do diretório configurado na tag <designDir> na sessão de configurações do pom.xml.
 
 h3. Como executar
 
-* publish-redmine-wiki
+* publish-wiki
 <pre>
-mvn br.ufms.nti:nti-maven-plugin:publish-redmine-wiki
+mvn redmine-publisher:publish-wiki
 </pre>
