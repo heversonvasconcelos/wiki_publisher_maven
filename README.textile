@@ -41,7 +41,7 @@ Exemplo:
 		<plugins>
 			<plugin>
 				<groupId>br.ufms.nti</groupId>
-				<artifactId>nti-maven-plugin</artifactId>
+				<artifactId>redmine-wiki-publisher</artifactId>
 				<configuration>
 					<projectIdentifier>${project.artifactId}</projectIdentifier>
 					<redmineDatabase>redmine-postgresql</redmineDatabase>
@@ -119,7 +119,7 @@ Exemplo:
 		...
 		<plugin>
 			<groupId>br.ufms.nti</groupId>
-			<artifactId>nti-maven-plugin</artifactId>
+			<artifactId>redmine-wiki-publisher</artifactId>
 			<configuration>
 				<projectIdentifier>${project.artifactId}</projectIdentifier>
 				<redmineDatabase>redmine-postgresql</redmineDatabase>
