@@ -152,6 +152,6 @@ h3. Como executar
 
 * publish-wiki
 <pre>
-mvn redmine-publisher:publish-wiki
+mvn redmine-wiki-publisher:publish-wiki
 </pre>
 

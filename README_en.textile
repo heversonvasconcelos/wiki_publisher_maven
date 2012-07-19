@@ -146,8 +146,8 @@ h3. Goals
 
 h3. How to execute
 
-* publish-redmine-wiki
+* publish-wiki
 <pre>
-mvn redmine-publisher:publish-wiki
+mvn redmine-wiki-publisher:publish-wiki
 </pre>
 
