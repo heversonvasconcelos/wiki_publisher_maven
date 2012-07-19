@@ -1,10 +1,10 @@
-h1. Redmine Publisher
+h1. Redmine Wiki Publisher
 
 {{>TOC}}
 
 h2. DESCRIPTION
 
-Redmine Publisher is a Maven 2 plugin that aims to assist on documentation publishing
+Redmine Wiki Publisher is a Maven 2 plugin that aims to assist on documentation publishing
 in the Redmine wiki of a particular project. Your development had as motivation:
 
 * Eliminate the need for a specific site for documentation and reports as is done in the current site plugin of the maven. Thus, the documentation stays centralized with the project management on Redmine.
@@ -15,6 +15,15 @@ This plugin had as reference and base, the Maven Redmine plugin, developed by Ju
 
 "Fastconnect Maven Site":http://opensource.fastconnect.org/projects/maven-redmine-plugin/1.1/
 "Fastconnect Redmine":https://opensource.fastconnect.org/redmine/projects/maven-redmine-plugin
+
+h2. DEVELOPMENT TEAM
+
+Redmine Wiki Publisher was developed by a team from DIDE - Divisão de Desenvolvimento
+do "Núcleo de Tecnologia da Informação - UFMS":http://nti.ufms.br
+
+* Daniel Camargo - daniel.camargo@ufms.br - danielsudpr@gmail.com
+* Heverson Vasconcelos - heverson.vasconcelos@ufms.br - heverson.vasconcelos@gmail.com
+* Vinícius Souza - vinicius.souza@ufms.br - viniciuspodi@gmail.com
 
 h2. CONFIGURATIONS
 
@@ -141,3 +150,4 @@ h3. How to execute
 <pre>
 mvn redmine-publisher:publish-wiki
 </pre>
+

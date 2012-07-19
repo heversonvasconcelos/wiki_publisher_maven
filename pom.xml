@@ -11,10 +11,19 @@
 	</parent>
 
 	<groupId>br.ufms.nti</groupId>
-	<artifactId>nti-maven-plugin</artifactId>
+	<artifactId>redmine_wiki_publisher</artifactId>
 	<packaging>maven-plugin</packaging>
 
-	<name>NTI Maven Plugin</name>
+    <name>Redmine Wiki Publisher</name>
+    <description>
+        O Redmine Wiki Publisher é um plugin do Maven 2 que tem como objetivo auxiliar a publicação
+        da documentação na Wiki do Redmine de um determinado projeto.
+    </description>
+
+    <organization>
+        <name>UFMS</name>
+        <url>http://nti.ufms.br<ufms/url>
+    </organization>
 
 	<developers>
 		<developer>
@@ -101,7 +110,7 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-plugin-plugin</artifactId>
 				<configuration>
-					<goalPrefix>redmine-publisher</goalPrefix>
+					<goalPrefix>redmine-wiki-publisher</goalPrefix>
 				</configuration>
 			</plugin>
 		</plugins>
