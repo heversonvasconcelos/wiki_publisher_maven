@@ -1,10 +1,10 @@
-h1. Redmine Wiki Publisher
+h1. Wiki Publisher Maven
 
 {{>TOC}}
 
 h2. DESCRIÇÃO
 
-O Redmine Wiki Publisher é um plugin do Maven 2 que tem como objetivo auxiliar a publicação
+O Wiki Publisher Maven é um plugin do Maven 2 que tem como objetivo auxiliar a publicação
 da documentação na Wiki do Redmine de um determinado projeto. O seu desenvolvimento
 teve como motivação:
 
@@ -20,12 +20,13 @@ por Julien Eluard.
 
 h2. EQUIPE DE DESENVOLVIMENTO
 
-O Redmine Wiki Publisher foi desenvolvido por uma equipe da DIDE - Divisão de Desenvolvimento
+O Wiki Publisher Maven foi desenvolvido por uma equipe da DIDE - Divisão de Desenvolvimento
 do "Núcleo de Tecnologia da Informação - UFMS":http://nti.ufms.br
 
 * Daniel Camargo - daniel.camargo@ufms.br - danielsudpr@gmail.com
-* Heverson Vasconcelos - heverson.vasconcelos@ufms.br - heverson.vasconcelos@gmail.com
-* Vinícius Souza - vinicius.souza@ufms.br - viniciuspodi@gmail.com
+* Heverson Vasconcelos - heverson.vasconcelos@aluno.ufms.br - heverson.vasconcelos@gmail.com
+* Rodrigo Kuninari - rodrigo.kuninari@aluno.ufms.br - rodrigokuninari@gmail.com
+* Vinícius Souza - vinicius.souza@aluno.ufms.br - viniciuspodi@gmail.com
 
 
 h2. CONFIGURAÇÕES
@@ -119,7 +120,7 @@ Exemplo:
 		...
 		<plugin>
 			<groupId>br.ufms.nti</groupId>
-			<artifactId>redmine-wiki-publisher</artifactId>
+			<artifactId>wiki-publisher-maven</artifactId>
 			<configuration>
 				<projectIdentifier>${project.artifactId}</projectIdentifier>
 				<redmineDatabase>redmine-postgresql</redmineDatabase>
@@ -146,12 +147,12 @@ h2. USO
 h3. Goals
 
 * publish-wiki
-> Publica a documentação do projeto na Wiki do Redmine. O Redmine Wiki Publisher irá exportar o conteúdo do diretório configurado na tag <designDir> (seção de configurações do plugin no pom.xml), para páginas wiki.
+> Publica a documentação do projeto na Wiki do Redmine. O Wiki Publisher Maven irá exportar o conteúdo do diretório configurado na tag <designDir> (seção de configurações do plugin no pom.xml), para páginas wiki.
 
 h3. Como executar
 
 * publish-wiki
 <pre>
-mvn redmine-wiki-publisher:publish-wiki
+mvn wiki-publisher-maven:publish-wiki
 </pre>
 

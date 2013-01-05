@@ -1,10 +1,10 @@
-h1. Redmine Wiki Publisher
+h1. Wiki Publisher Maven
 
 {{>TOC}}
 
 h2. DESCRIPTION
 
-Redmine Wiki Publisher is a Maven 2 plugin that aims to assist on documentation publishing
+Wiki Publisher Maven is a Maven 2 plugin that aims to assist on documentation publishing
 in the Redmine wiki of a particular project. Your development had as motivation:
 
 * Eliminate the need for a specific site for documentation and reports as is done in the current site plugin of the maven. Thus, the documentation stays centralized with the project management on Redmine.
@@ -18,11 +18,12 @@ This plugin had as reference and base, the Maven Redmine plugin, developed by Ju
 
 h2. DEVELOPMENT TEAM
 
-Redmine Wiki Publisher was developed by a team from DIDE - Divisão de Desenvolvimento
+Wiki Publisher Maven was developed by a team from DIDE - Divisão de Desenvolvimento
 do "Núcleo de Tecnologia da Informação - UFMS":http://nti.ufms.br
 
 * Daniel Camargo - daniel.camargo@ufms.br - danielsudpr@gmail.com
 * Heverson Vasconcelos - heverson.vasconcelos@ufms.br - heverson.vasconcelos@gmail.com
+* Rodrigo Kuninari - rodrigo.kuninari@aluno.ufms.br - rodrigokuninari@gmail.com
 * Vinícius Souza - vinicius.souza@ufms.br - viniciuspodi@gmail.com
 
 h2. CONFIGURATIONS
@@ -38,7 +39,7 @@ Example:
 		<plugins>
 			<plugin>
 				<groupId>br.ufms.nti</groupId>
-				<artifactId>redmine-wiki-publisher</artifactId>
+				<artifactId>wiki-publisher-maven</artifactId>
 				<configuration>
 					<projectIdentifier>${project.artifactId}</projectIdentifier>
 					<redmineDatabase>redmine-postgresql</redmineDatabase>
@@ -115,7 +116,7 @@ Example:
 		...
 		<plugin>
 			<groupId>br.ufms.nti</groupId>
-			<artifactId>redmine-wiki-publisher</artifactId>
+			<artifactId>wiki-publisher-maven</artifactId>
 			<configuration>
 				<projectIdentifier>${project.artifactId}</projectIdentifier>
 				<redmineDatabase>redmine-postgresql</redmineDatabase>
@@ -148,6 +149,6 @@ h3. How to execute
 
 * publish-wiki
 <pre>
-mvn redmine-wiki-publisher:publish-wiki
+mvn wiki-publisher-maven:publish-wiki
 </pre>
 
